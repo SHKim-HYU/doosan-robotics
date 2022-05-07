@@ -3,7 +3,7 @@ import rospy
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import JointState
 from copy import copy
-from math import sin, cos
+from math import sin, cos, tan
 from dsr_msgs.msg import ServoJStream
 
 rate=10
