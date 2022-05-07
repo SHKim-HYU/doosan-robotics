@@ -1,2 +1,2 @@
-__dsr__id = ""
-__dsr__model = ""
+__dsr__id = "dsr01"
+__dsr__model = "m0609"
