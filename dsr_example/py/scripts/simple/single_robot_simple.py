@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ##
 # @brief    [py example simple] motion basic test for doosan robot
@@ -13,7 +13,7 @@ sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../.
 
 # for single robot 
 ROBOT_ID     = "dsr01"
-ROBOT_MODEL  = "m1013"
+ROBOT_MODEL  = "m0609"
 import DR_init
 DR_init.__dsr__id = ROBOT_ID
 DR_init.__dsr__model = ROBOT_MODEL
@@ -166,12 +166,12 @@ if __name__ == "__main__":
     b_list1 = [seg11, seg12, seg14, seg15, seg16] 
 
     while not rospy.is_shutdown():
-        movej(p2, vel=100, acc=100)
+        movej(p2, vel=100, acc=100, time=2)
        # movejx(x1, vel=30, acc=60, sol=0)
         #movel(x2, velx, accx)
-        movej(p1, vel=100, acc=100)
+        #movej(p1, vel=100, acc=100)
        # movec(c1, c2, velx, accx)
-       # movesj(qlist, vel=100, acc=100)
+        movesj(qlist, vel=100, acc=100, time=10)
        # movesx(xlist, vel=100, acc=100)
        # move_spiral(rev=9.5,rmax=20.0,lmax=50.0,time=20.0,axis=DR_AXIS_Z,ref=DR_TOOL)
        # move_periodic(amp =[10,0,0,0,30,0], period=1.0, atime=0.2, repeat=5, ref=DR_TOOL)
