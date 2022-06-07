@@ -2,7 +2,7 @@ dsr:
   # Publish all joint states -----------------------------------
   joint_state_controller:
     type: joint_state_controller/JointStateController
-    publish_rate: 125
+    publish_rate: 1000
 
   # Position Controllers ---------------------------------------
   joint1_position:
@@ -34,6 +34,3 @@ dsr:
     type: position_controllers/JointPositionController
     joint: joint6
     pid: {p: 300.0, i: 20.0, d: 25.0, i_clamp: 500}
-
-
-

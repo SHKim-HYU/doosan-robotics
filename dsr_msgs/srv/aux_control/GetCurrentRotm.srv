@@ -5,5 +5,5 @@
 
 int8        ref               # DR_BASE(0), DR_WORLD(2)
 ---
-std_msgs/Float64MultiArray[] rot_matrix  # target[3][3] Rotation matrix
+std_msgs/Float32MultiArray[] rot_matrix  # target[3][3] Rotation matrix
 bool        success

@@ -22,7 +22,7 @@ dsr_joint_trajectory_controller:
 
 dsr_joint_publisher:
   type: joint_state_controller/JointStateController
-  publish_rate: 150
+  publish_rate: 1000
 
 dsr_joint1_position:
   type: position_controllers/JointPositionController

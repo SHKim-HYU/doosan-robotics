@@ -30,7 +30,8 @@ add_message_files(
 
 add_service_files(
     FILES
-
+    
+    ./system/SetRobotSafetyMode.srv
     ./system/SetRobotMode.srv
     ./system/GetRobotMode.srv
     ./system/SetRobotSystem.srv

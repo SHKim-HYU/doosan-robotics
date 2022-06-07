@@ -3,7 +3,7 @@
 # 
 #____________________________________________________________________________________________
 
-float64[6] pos               # position  
-float64[6] vel               # velocity
-float64[6] acc               # acceleration
-float64    time              # time
+float32[6] pos               # position  
+float32[6] vel               # velocity
+float32[6] acc               # acceleration
+float32    time              # time

@@ -3,5 +3,5 @@
 # 
 #____________________________________________________________________________________________
 
-float64[6] tor               # motor torque
-float64    time              # time
+float32[6] tor               # motor torque
+float32    time              # time

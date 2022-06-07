@@ -5,6 +5,6 @@
 
 int8       id                # ID of user coord 
 ---
-float64[6] conv_posx         # task pos(posx)  
+float32[6] conv_posx         # task pos(posx)  
 int8       ref               # Reference coordinate of the coordinate to get
 bool       success

@@ -2,6 +2,6 @@
 # release_force  
 #____________________________________________________________________________________________
 
-float64    time # 0          # Time needed to reduce the force (0 ~ 1.0) 
+float32    time # 0          # Time needed to reduce the force (0 ~ 1.0) 
 ---
 bool       success 

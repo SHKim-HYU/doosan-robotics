@@ -4,5 +4,5 @@
 
 int8 space_type # 0=ROBOT_SPACE_JOINT, 1=ROBOT_SPACE_TASK
 ---
-float64[6] pos
+float32[6] pos
 bool       success

@@ -314,10 +314,10 @@ namespace dsr_control{
         switch((unsigned char)eState)
         {
 #if 0 // TP initializing logic, Don't use in API level. (If you want to operate without TP, use this logic)
-        case eSTATE_NOT_READY:
+        case STATE_NOT_READY:
         if (g_bHasControlAuthority) Drfl.SetRobotControl(CONTROL_INIT_CONFIG);
             break;
-        case eSTATE_INITIALIZING:
+        case STATE_INITIALIZING:
             // add initalizing logic
             if (g_bHasControlAuthority) Drfl.SetRobotControl(CONTROL_ENABLE_OPERATION);
             break;
@@ -338,7 +338,7 @@ namespace dsr_control{
         case STATE_SAFE_OFF:
             if (g_bHasControlAuthority){
                 Drfl.set_robot_control(CONTROL_SERVO_ON);
-				Drfl.set_robot_mode(ROBOT_MODE_MANUAL);   //Idle Servo Off 후 servo on 하는 상황 발생 시 set_robot_mode 명령을 전송해 manual 로 전환. add 2020/04/28
+				//Drfl.set_robot_mode(ROBOT_MODE_MANUAL);   //Idle Servo Off 후 servo on 하는 상황 발생 시 set_robot_mode 명령을 전송해 manual 로 전환. add 2020/04/28
             }
             break;
         case STATE_SAFE_STOP2:
@@ -523,7 +523,7 @@ namespace dsr_control{
         }
         msg.solution_space      = m_stDrState.nSolutionSpace;
         msg.sync_time           = m_stDrState.dSyncTime;
-        std_msgs::Float64MultiArray arr;
+        std_msgs::Float32MultiArray arr;
 
         for (int i = 0; i < 3; i++){
             arr.data.clear();
@@ -725,7 +725,7 @@ namespace dsr_control{
         ///m_PubJogMultiAxis = private_nh_.advertise<dsr_msgs::JogMultiAxis>("jog_multi",100);
 
         // gazebo에 joint position 전달
-        m_PubtoGazebo = private_nh_.advertise<std_msgs::Float64MultiArray>("/dsr_joint_position_controller/command",1);
+        m_PubtoGazebo = private_nh_.advertise<std_msgs::Float32MultiArray>("/dsr_joint_position_controller/command",1);
         // moveit의 trajectory/goal를 받아 제어기로 전달
         m_sub_joint_trajectory = private_nh_.subscribe("dsr_joint_trajectory_controller/follow_joint_trajectory/goal", 10, &DRHWInterface::trajectoryCallback, this);
         // topic echo 명령으로 제어기에 전달
@@ -765,6 +765,7 @@ namespace dsr_control{
         m_nh_system[12]= private_nh_.advertiseService("system/set_robot_control", &DRHWInterface::set_robot_control_cb, this);
         m_nh_system[13]= private_nh_.advertiseService("system/manage_access_control", &DRHWInterface::manage_access_control_cb, this);
         m_nh_system[14]= private_nh_.advertiseService("system/release_protective_stop", &DRHWInterface::release_protective_stop_cb, this);
+        m_nh_system[15]= private_nh_.advertiseService("system/set_robot_safety_mode", &DRHWInterface::set_robot_safety_mode_cb, this);
 
         //  motion Operations
         m_nh_motion_service[0] = private_nh_.advertiseService("motion/move_joint", &DRHWInterface::movej_cb, this);
@@ -1029,7 +1030,7 @@ namespace dsr_control{
 
     void DRHWInterface::read(ros::Duration& elapsed_time)
     {
-        std_msgs::Float64MultiArray msg;
+        std_msgs::Float32MultiArray msg;
         // joints.pos, vel, eff should be update
         //ROS_DEBUG("DRHWInterface::read()");
         LPROBOT_POSE pose = Drfl.GetCurrentPose();
@@ -1089,7 +1090,7 @@ namespace dsr_control{
 
         ROS_INFO("[sigint_hangler] CloseConnection");
     }
-    void DRHWInterface::positionCallback(const std_msgs::Float64MultiArray::ConstPtr& msg){
+    void DRHWInterface::positionCallback(const std_msgs::Float32MultiArray::ConstPtr& msg){
         ROS_INFO("callback: Position received");
         std::array<float, NUM_JOINT> target_pos;
         std::copy(msg->data.cbegin(), msg->data.cend(), target_pos.begin());
@@ -1381,6 +1382,13 @@ namespace dsr_control{
         return true;
     }
 
+    bool DRHWInterface::set_robot_safety_mode_cb(dsr_msgs::SetRobotSafetyMode::Request& req, dsr_msgs::SetRobotSafetyMode::Response& res){
+        res.success = false;
+        Drfl.set_safety_mode((SAFETY_MODE)req.robot_safety_mode, (SAFETY_MODE_EVENT)req.robot_safety_mode_event);
+        res.success = true;
+        return true;
+    }
+
     //----- MOTION Service Call-back functions ------------------------------------------------------------
 
     bool DRHWInterface::movej_cb(dsr_msgs::MoveJoint::Request& req, dsr_msgs::MoveJoint::Response& res)
@@ -1441,7 +1449,7 @@ namespace dsr_control{
         float fTargetAcc[2];
         for(int i = 0; i < 2; i++){
             for(int j = 0; j < NUM_TASK; j++){
-                std_msgs::Float64MultiArray pos = req.pos.at(i);
+                std_msgs::Float32MultiArray pos = req.pos.at(i);
                 fTargetPos[i][j] = pos.data[j];
             }
             fTargetVel[i] = req.vel[i];
@@ -1468,7 +1476,7 @@ namespace dsr_control{
 
         for(int i=0; i<req.posCnt; i++){
             for(int j=0; j<NUM_JOINT; j++){
-                std_msgs::Float64MultiArray pos = req.pos.at(i);
+                std_msgs::Float32MultiArray pos = req.pos.at(i);
                 fTargetPos[i][j] = pos.data[j];
             }
         }
@@ -1497,7 +1505,7 @@ namespace dsr_control{
 
         for(int i=0; i<req.posCnt; i++){
             for(int j=0; j<NUM_TASK; j++){
-                std_msgs::Float64MultiArray pos = req.pos.at(i);
+                std_msgs::Float32MultiArray pos = req.pos.at(i);
                 fTargetPos[i][j] = pos.data[j];
             }
           //  fTargetVel[i] = req.vel[i];
@@ -1522,7 +1530,7 @@ namespace dsr_control{
         res.success = false;
         MOVE_POSB posb[req.posCnt];
         for(int i=0; i<req.posCnt; i++){
-            std_msgs::Float64MultiArray segment = req.segment.at(i);
+            std_msgs::Float32MultiArray segment = req.segment.at(i);
             for(int j=0; j<NUM_TASK; j++){
                 posb[i]._fTargetPos[0][j] = segment.data[j];            //0~5
                 posb[i]._fTargetPos[1][j] = segment.data[j + NUM_TASK]; //6~11
@@ -1909,7 +1917,7 @@ namespace dsr_control{
     bool DRHWInterface::get_current_posx_cb(dsr_msgs::GetCurrentPosx::Request& req, dsr_msgs::GetCurrentPosx::Response& res)
     {
         res.success = false;
-        std_msgs::Float64MultiArray arr;
+        std_msgs::Float32MultiArray arr;
 
     #if (_DEBUG_DSR_CTL)
         ROS_INFO("< get_current_posx_cb >");
@@ -1991,7 +1999,7 @@ namespace dsr_control{
     bool DRHWInterface::get_current_rotm_cb(dsr_msgs::GetCurrentRotm::Request& req, dsr_msgs::GetCurrentRotm::Response& res)
     {
         res.success = false;
-        std_msgs::Float64MultiArray arr;
+        std_msgs::Float32MultiArray arr;
 
     #if (_DEBUG_DSR_CTL)
         ROS_INFO("< get_current_rotm_cb >");
@@ -2989,6 +2997,7 @@ namespace dsr_control{
     {
         res.success = false;
         res.success = Drfl.connect_rt_control(req.ip_address, req.port);
+        // res.success = Drfl.connect_rt_control(req.ip_address);
         return true;
     }
     bool DRHWInterface::disconnect_rt_control_cb(dsr_msgs::DisconnectRTControl::Request& req, dsr_msgs::DisconnectRTControl::Response& res)
@@ -3123,7 +3132,7 @@ namespace dsr_control{
             res.data.goal_tcp_position[i] = temp->goal_tcp_position[i];
         }
 
-        std_msgs::Float64MultiArray arr;
+        std_msgs::Float32MultiArray arr;
         for(int i=0; i<6; i++){
             arr.data.clear();
             for(int j=0; j<6; j++){
@@ -3132,7 +3141,7 @@ namespace dsr_control{
             res.data.coriolis_matrix.push_back(arr);
         }
 
-        std_msgs::Float64MultiArray arr1;
+        std_msgs::Float32MultiArray arr1;
         for(int i=0; i<6; i++){
             arr1.data.clear();
             for(int j=0; j<6; j++){
@@ -3141,7 +3150,7 @@ namespace dsr_control{
             res.data.mass_matrix.push_back(arr1);
         }
 
-        std_msgs::Float64MultiArray arr2;
+        std_msgs::Float32MultiArray arr2;
         for(int i=0; i<6; i++){
             arr2.data.clear();
             for(int j=0; j<6; j++){

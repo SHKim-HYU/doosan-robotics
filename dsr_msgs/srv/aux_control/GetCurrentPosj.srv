@@ -4,5 +4,5 @@
 # This service returns the current joint angle.
 
 ---
-float64[6] pos               # joint pos(posj)  
+float32[6] pos               # joint pos(posj)  
 bool       success

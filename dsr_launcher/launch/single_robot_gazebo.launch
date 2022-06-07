@@ -13,6 +13,7 @@
   <arg name="color" default="white"/>
   <arg name="gripper" default="none"/>
   <arg name="mobile" default="none"/>
+  <arg name="controller" default="position"/>
 
 
   <!-- Start Gazebo with an empty world. -->
@@ -33,6 +34,7 @@
     <arg name="color"         value="$(arg color)"/>
     <arg name="gripper"       value="$(arg gripper)"/>
     <arg name="mobile"        value="$(arg mobile)"/>
+    <arg name="controller" value="$(arg controller)"/>
 
     <arg name="x"             value="0"/>
     <arg name="y"             value="0"/>

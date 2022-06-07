@@ -32,9 +32,12 @@
 
 	<!-- 제어기를 위한 position_controller, joint_state 정의 -->
 	<rosparam command="load" file="$(find dsr_control)/config/$(arg yaml).yaml" ns="$(arg ns)$(arg model)" />
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" output="screen"
+  <!--  <node name="controller_spawner" pkg="controller_manager" type="spawner" output="screen"
 				args="dsr_joint_$(arg controller)_controller dsr_joint_publisher" ns="$(arg ns)$(arg model)">
-	</node>
+	</node> -->
+      <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" output="screen"
+				args="dsr_joint_position_controller dsr_joint_publisher" ns="$(arg ns)$(arg model)">
+	</node> -->
 
     <!--node pkg="dsr_control" type="run.sh" name="foo"/-->
 	<!--node pkg="aliencontrol" type="aliencontrol" name="aliencontrol"-->
@@ -45,7 +48,7 @@
 
 	<node pkg="dsr_control" type="dsr_control_node" name="$(arg ns)$(arg model)" respawn="false" output="screen">
 		<param name="name" value="$(arg ns)" />
-		<param name="rate" value="100" />
+		<param name="rate" value="1000" />
 		<param name="standby" value="5000" />
 		<param name="command" value="true" />
 		<param name="host" value="$(arg host)" />

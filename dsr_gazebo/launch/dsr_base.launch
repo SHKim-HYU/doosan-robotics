@@ -78,6 +78,7 @@
     <arg name="color"   value="$(arg color)"/>
     <arg name="gripper" value="$(arg gripper)"/>
     <arg name="mobile"  value="$(arg mobile)"/>
+    <arg name="controller" value="$(arg controller)"/>
   </include>
 
   <!-- ARM은 /world에 fixed되어 있으므로 map에 열결

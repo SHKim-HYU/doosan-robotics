@@ -14,10 +14,13 @@
 
 	    <!-- base_frame_id와 localization.yaml의 base_link_frame과의 관계를 일치 시킨다. -->
 		<param name="$(arg ns)/dsr_velocity_controller/base_frame_id" value="$(arg ns)/base_link"/>
+		
+		
 		<node name="controller_spawner" pkg="controller_manager" type="spawner" output="screen"
 					args="dsr_joint_position_controller dsr_velocity_controller dsr_joint_publisher" ns="$(arg ns)">
 
 		</node>
+		
 		<!-- gazebo의 joint_state와 연결   -->
 		<node name="mobile_robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns="$(arg ns)">
 			<param name="tf_prefix" value="$(arg ns)" />
@@ -46,7 +49,7 @@
 	<!-- gazebo를 위한 joint_position_controller -->
 	<group if="$(eval arg('mobile') == 'none')">
 		<rosparam command="load" file="$(find dsr_control)/config/$(arg yaml).yaml" ns="$(arg ns)" />
-		<node name="controller_spawner" pkg="controller_manager" type="spawner" output="screen" args="dsr_joint_position_controller" ns="$(arg ns)">
-		</node>
+		<!--<node name="controller_spawner" pkg="controller_manager" type="spawner" output="screen" args="dsr_joint_position_controller" ns="$(arg ns)">
+		</node>-->
 	</group>
 </launch>

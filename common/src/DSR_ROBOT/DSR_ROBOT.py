@@ -547,22 +547,22 @@ def set_accx(acc1, acc2=DR_COND_NONE):
     print_result("0 = set_accx(acc1:{0}, acc2:{1})".format(dr_form(acc1), dr_form(acc2)))
     return 0
 
-# convert : list -> Float64MultiArray
-def _ros_listToFloat64MultiArray(list_src):
+# convert : list -> Float32MultiArray
+def _ros_listToFloat32MultiArray(list_src):
     _res = []
     for i in list_src:
-        item = Float64MultiArray()
+        item = Float32MultiArray()
         item.data = i
         _res.append(item)
     #print(_res)
     #print(len(_res))
     return _res
 
-# convert : Float64MultiArray -> list
-def _ros_Float64MultiArrayTolist(multi_arr_f64):
+# convert : Float32MultiArray -> list
+def _ros_Float32MultiArrayTolist(multi_arr_f32):
     _res = []
-    for i in range( len(multi_arr_f64) ):
-        _res.append( list(multi_arr_f64[i].data) )   
+    for i in range( len(multi_arr_f32) ):
+        _res.append( list(multi_arr_f32[i].data) )   
     #print(_res)
     #print(len(_res))
     return _res
@@ -1100,7 +1100,7 @@ def get_current_posx(ref=None):
 
     if __ROS__:
         srv = _ros_get_current_posx(_ref)  
-        posx_info = _ros_Float64MultiArrayTolist(srv.task_pos_info) # Convert Float64MultiArray to list
+        posx_info = _ros_Float32MultiArrayTolist(srv.task_pos_info) # Convert Float32MultiArray to list
         pos = []
         for i in range(POINT_COUNT):
             pos.append(posx_info[0][i])
@@ -1243,7 +1243,7 @@ def get_current_rotm(ref=None):
 
     if __ROS__:
         srv = _ros_get_current_rotm(_ref)  
-        rotm = _ros_Float64MultiArrayTolist(srv.rot_matrix) # Convert Float64MultiArray to list 
+        rotm = _ros_Float32MultiArrayTolist(srv.rot_matrix) # Convert Float32MultiArray to list 
     else:
         # C function call
         rotm = PythonMgr.py_get_current_rotm(_ref)
@@ -1976,7 +1976,7 @@ def _movec(pos1, pos2, vel=None, acc=None, time=None, radius=None, ref=None, mod
     # ROS service call
     if __ROS__:
         # make multi pos
-        _circle_pos = _ros_listToFloat64MultiArray([_pos1, _pos2])
+        _circle_pos = _ros_listToFloat32MultiArray([_pos1, _pos2])
         #print(_circle_pos)
         srv = _ros_movec(_circle_pos, _vel, _acc, _time, _radius, _ref, mod, _angle[0], _angle[1], ra, _async) 
         #ret = srv.success
@@ -2069,7 +2069,7 @@ def _movesj(pos_list, vel=None, acc=None, time=None, mod= DR_MV_MOD_ABS, v=None,
     # ROS service call
     if __ROS__:
         # make multi pos
-        _spline_posj = _ros_listToFloat64MultiArray(pos_list)
+        _spline_posj = _ros_listToFloat32MultiArray(pos_list)
         srv = _ros_movesj(_spline_posj, len(_spline_posj), _vel, _acc, _time, mod, _async)
         #ret = srv.success
         ret = 0 if (srv.success == True) else -1
@@ -2188,7 +2188,7 @@ def _movesx(pos_list, vel=None, acc=None, time=None, ref=None, mod= DR_MV_MOD_AB
 
     # ROS service call
     if __ROS__:
-        _spline_posx = _ros_listToFloat64MultiArray(pos_list)
+        _spline_posx = _ros_listToFloat32MultiArray(pos_list)
         srv = _ros_movesx(_spline_posx, len(_spline_posx), _vel, _acc, _time, mod, _ref, vel_opt, _async)
         #ret = srv.success
         ret = 0 if (srv.success == True) else -1
@@ -2320,7 +2320,7 @@ def _moveb(seg_list, vel=None, acc=None, ref=None, time=None, mod=DR_MV_MOD_ABS,
 
     # ROS Service call
     if __ROS__:
-        seg = _ros_listToFloat64MultiArray(_ros_seg_list)
+        seg = _ros_listToFloat32MultiArray(_ros_seg_list)
         srv = _ros_moveb(seg, len(_ros_seg_list), _vel, _acc, _time, _ref, mod, _async)    
         #ret = srv.success
         ret = 0 if (srv.success == True) else -1
@@ -4955,7 +4955,7 @@ class CDsrRobot:
             
         if __ROS__:
             srv = self._ros_get_current_posx(_ref)  
-            posx_info = _ros_Float64MultiArrayTolist(srv.task_pos_info) # Convert Float64MultiArray to list
+            posx_info = _ros_Float32MultiArrayTolist(srv.task_pos_info) # Convert Float32MultiArray to list
             pos = []
             for i in range(POINT_COUNT):
                 pos.append(posx_info[0][i])
@@ -5099,7 +5099,7 @@ class CDsrRobot:
     
         if __ROS__:
             srv = self._ros_get_current_rotm(_ref)  
-            rotm = _ros_Float64MultiArrayTolist(srv.rot_matrix) # Convert Float64MultiArray to list 
+            rotm = _ros_Float32MultiArrayTolist(srv.rot_matrix) # Convert Float32MultiArray to list 
         else:
             # C function call
             rotm = PythonMgr.py_get_current_rotm(_ref)
@@ -5829,7 +5829,7 @@ class CDsrRobot:
         # ROS service call
         if __ROS__:
             # make multi pos
-            _circle_pos = _ros_listToFloat64MultiArray([_pos1, _pos2])
+            _circle_pos = _ros_listToFloat32MultiArray([_pos1, _pos2])
             #print(_circle_pos)
             srv = self._ros_movec(_circle_pos, _vel, _acc, _time, _radius, _ref, mod, _angle[0], _angle[1], ra, _async) 
             #ret = srv.success
@@ -5922,7 +5922,7 @@ class CDsrRobot:
         # ROS service call
         if __ROS__:
             # make multi pos
-            _spline_posj = _ros_listToFloat64MultiArray(pos_list)
+            _spline_posj = _ros_listToFloat32MultiArray(pos_list)
             srv = self._ros_movesj(_spline_posj, len(_spline_posj), _vel, _acc, _time, mod, _async)
             #ret = srv.success
             ret = 0 if (srv.success == True) else -1
@@ -6041,7 +6041,7 @@ class CDsrRobot:
     
         # ROS service call
         if __ROS__:
-            _spline_posx = _ros_listToFloat64MultiArray(pos_list)
+            _spline_posx = _ros_listToFloat32MultiArray(pos_list)
             srv = self._ros_movesx(_spline_posx, len(_spline_posx), _vel, _acc, _time, mod, _ref, vel_opt, _async)
             #ret = srv.success
             ret = 0 if (srv.success == True) else -1
@@ -6173,7 +6173,7 @@ class CDsrRobot:
     
         # ROS Service call
         if __ROS__:
-            seg = _ros_listToFloat64MultiArray(_ros_seg_list)
+            seg = _ros_listToFloat32MultiArray(_ros_seg_list)
             srv = self._ros_moveb(seg, len(_ros_seg_list), _vel, _acc, _time, _ref, mod, _async)    
             #ret = srv.success
             ret = 0 if (srv.success == True) else -1

@@ -5,5 +5,5 @@
 # It cannot be used in the movel, movec, movesx, moveb, move_spiral, or move_periodic service.
 
 ---
-float64[6] pos               # joint pos(posj)  
+float32[6] pos               # joint pos(posj)  
 bool       success

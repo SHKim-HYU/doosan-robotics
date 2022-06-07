@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+    <rosparam file="$(find m0609_controller)/config/m0609_controller.yaml" command="load"/>
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+          output="screen" ns="/dsr01" args="joint_state_controller PD_Gravity"/>
+
+    <!--<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns="/dsr01"/>-->
+</launch>
