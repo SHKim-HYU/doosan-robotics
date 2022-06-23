@@ -86,8 +86,8 @@ while not rospy.is_shutdown():
 #        trj_q=[0,0,90,0,90,0]
         trj_q=[0,45,90,0,-45,0]
 #        trj_q=[90,45,90,0,-45,0]
-        motion+=1
-#        motion=0
+#        motion+=1
+        motion=0
         traj_flag=[1]*6
     elif motion==2 and traj_flag[0]==0:
         trj_q=[0,0,0,0,0,0]
@@ -163,15 +163,15 @@ while not rospy.is_shutdown():
         for i in range(6):
             tor_ext[i] = alpha*tor_ext_tmp[i] + (1-alpha)*buf_tor_ext[i];
             if i == 0:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+2.5*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
             elif i == 1:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+2*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
             elif i == 2:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+2.5*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
             elif i == 3:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+3*tor_ext[i]
-            elif i == 4:
                 cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+4*tor_ext[i]
+            elif i == 4:
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+5*tor_ext[i]
             elif i == 5:
                 cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+6*tor_ext[i]
             buf_tor_ext[i]=tor_ext[i]
