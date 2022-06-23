@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ##
 # @brief    [py example gripper] gripper test for doosan robot
@@ -12,7 +12,7 @@ import random
 from geometry_msgs.msg import Twist
 
 sys.dont_write_bytecode = True
-sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../../../common/imp")) ) # get import path : DSR_ROBOT.py 
+#sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../../../common/imp")) ) # get import path : DSR_ROBOT.py 
 
 # for single robot 
 ROBOT_ID1    = "dsr01"
@@ -22,9 +22,9 @@ ROBOT_MODEL2 = "m1013"
 
 RAND_MAX = 2147483647
 
-#import DR_init
-#DR_init.__dsr__id = ROBOT_ID1
-#DR_init.__dsr__model = ROBOT_MODEL1
+#from DSR_ROBOT import *
+#__dsr__id = ROBOT_ID1
+#__dsr__model = ROBOT_MODEL1
 from DSR_ROBOT import *
 
 NUM_ROBOT = 2

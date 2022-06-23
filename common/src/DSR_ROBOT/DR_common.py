@@ -10,7 +10,7 @@
 #
 
 import collections
-from DR_error import *
+from .DR_error import *
 
 # point count
 POINT_COUNT = 6

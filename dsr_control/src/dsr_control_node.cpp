@@ -1,5 +1,5 @@
 /*
- * dsr_control_node 
+ * dsr_control_node
  * Author: Kab Kyoum Kim (kabkyoum.kim@doosan.com)
  *
  * Copyright (c) 2019 Doosan Robotics
@@ -12,17 +12,17 @@
 
 using namespace dsr_control;
 
-int g_nKill_dsr_control = false; 
+int g_nKill_dsr_control = false;
 void SigHandler(int sig)
 {
     // Do some custom action.
     // For example, publish a stop message to some other nodes.
-  
+
     // All the default sigint handler does is call shutdown()
     ROS_INFO("[dsr_control] shutdown time! (sig = %d)",sig);
     ROS_INFO("[dsr_control] shutdown time! (sig = %d)",sig);
     ROS_INFO("[dsr_control] shutdown time! (sig = %d)",sig);
-    
+
     g_nKill_dsr_control = true;
     ///usleep(1000*1000);
     ros::shutdown();
@@ -30,7 +30,7 @@ void SigHandler(int sig)
 
 int main(int argc, char** argv)
 {
-    //----- init ROS ---------------------- 
+    //----- init ROS ----------------------
     ///ros::init(argc, argv, "dsr_control_node");
     ros::init(argc, argv, "dsr_control_node", ros::init_options::NoSigintHandler);
     ros::NodeHandle private_nh("~");
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
             if(pArm) pArm->read(elapsed);
             cm.update(ros::Time::now(), elapsed);
             if(pArm) pArm->write(elapsed);
-            r.sleep();	//(1000/rate)[sec], default: 10ms 
+            r.sleep();	//(1000/rate)[sec], default: 10ms
         }
         catch(std::runtime_error& ex)
         {

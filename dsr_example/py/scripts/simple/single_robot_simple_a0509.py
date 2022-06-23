@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ##
 # @brief    [py example simple] motion basic test for doosan robot
@@ -9,15 +9,15 @@ import os
 import threading, time
 import sys
 sys.dont_write_bytecode = True
-sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../../../common/imp")) ) # get import path : DSR_ROBOT.py 
+#sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../../../common/imp")) ) # get import path : DSR_ROBOT.py 
 
 # for single robot 
 ROBOT_ID     = "dsr01"
 ROBOT_MODEL  = "a0509"
-import DR_init
-DR_init.__dsr__id = ROBOT_ID
-DR_init.__dsr__model = ROBOT_MODEL
 from DSR_ROBOT import *
+__dsr__id = ROBOT_ID
+__dsr__model = ROBOT_MODEL
+
 
 def shutdown():
     print("shutdown time!")

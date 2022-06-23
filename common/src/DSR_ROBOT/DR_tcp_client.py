@@ -27,7 +27,7 @@ import select
 import time
 #import ipaddress # 3.2 not supported
 
-from DR_error import *
+from .DR_error import *
 
 # =============================================================================================
 # define

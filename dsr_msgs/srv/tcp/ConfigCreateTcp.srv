@@ -4,6 +4,6 @@
 #____________________________________________________________________________________________
 
 string          name         # tcp name 
-float64[6]      pos          # coordinates of the TCP 
+float32[6]      pos          # coordinates of the TCP 
 ---
 bool success

@@ -48,7 +48,7 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 
-#include <std_msgs/Float64MultiArray.h>
+#include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/String.h>
 #include <std_srvs/Empty.h>
 
@@ -85,6 +85,7 @@
 #include <dsr_msgs/ManageAccessControl.h>
 #include <dsr_msgs/SetRobotControl.h>
 #include <dsr_msgs/ReleaseProtectiveStop.h>
+#include <dsr_msgs/SetRobotSafetyMode.h>
 
 // motion
 #include <dsr_msgs/MoveJoint.h>
@@ -621,7 +622,7 @@ namespace dsr_control{
         void sigint_handler( int signo);
 
         void trajectoryCallback(const control_msgs::FollowJointTrajectoryActionGoal::ConstPtr& msg);
-        void positionCallback(const std_msgs::Float64MultiArray::ConstPtr& msg);
+        void positionCallback(const std_msgs::Float32MultiArray::ConstPtr& msg);
 
         void jogCallback(const dsr_msgs::JogMultiAxis::ConstPtr& msg);
         void alterCallback(const dsr_msgs::AlterMotionStream::ConstPtr& msg);
@@ -661,6 +662,7 @@ namespace dsr_control{
         bool set_robot_control_cb(dsr_msgs::SetRobotControl::Request& req, dsr_msgs::SetRobotControl::Response& res);
         bool manage_access_control_cb(dsr_msgs::ManageAccessControl::Request& req, dsr_msgs::ManageAccessControl::Response& res);
         bool release_protective_stop_cb(dsr_msgs::ReleaseProtectiveStop::Request& req, dsr_msgs::ReleaseProtectiveStop::Response& res);
+        bool set_robot_safety_mode_cb(dsr_msgs::SetRobotSafetyMode::Request& req, dsr_msgs::SetRobotSafetyMode::Response& res);
 
         //----- MOTION
         bool movej_cb(dsr_msgs::MoveJoint::Request& req, dsr_msgs::MoveJoint::Response& res);

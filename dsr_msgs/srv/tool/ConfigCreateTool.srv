@@ -4,8 +4,8 @@
 #____________________________________________________________________________________________
 
 string          name        # tool name 
-float64         weight      # tool weight 
-float64[3]      cog         # Center of gravity
-float64[6]      inertia     # tool inertia 
+float32         weight      # tool weight 
+float32[3]      cog         # Center of gravity
+float32[6]      inertia     # tool inertia 
 ---
 bool success

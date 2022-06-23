@@ -6,10 +6,16 @@ catkin_package()
 
 FIND_PACKAGE(catkin REQUIRED COMPONENTS 
   roscpp
+  rospy
   gazebo_ros
   control_toolbox
   xmlrpcpp
 )
+
+## Uncomment this if the package has a setup.py. This macro ensures
+## modules and global scripts declared therein get installed
+## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
+catkin_python_setup()
 
 if($ENV{ROS_DISTRO} STREQUAL "kinetic")
     FIND_PACKAGE(gazebo REQUIRED)
@@ -99,6 +105,6 @@ else()
 endif()
 
 install(DIRECTORY
-    imp bin/DRCF/config 
+    bin/DRCF/config 
     DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

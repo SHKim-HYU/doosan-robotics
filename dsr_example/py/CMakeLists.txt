@@ -170,3 +170,8 @@ install(PROGRAMS scripts/simple/multi_robot_simple.py
 install(PROGRAMS scripts/simple/single_robot_simple.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+install(PROGRAMS scripts/simple/roscontrol_test.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+
+)

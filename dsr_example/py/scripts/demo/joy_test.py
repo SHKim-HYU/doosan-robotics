@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ##
 # @brief    [py example simple] joystick example
@@ -10,12 +10,12 @@ import threading, time
 import sys
 from sensor_msgs.msg import Joy    # Joy package import 
 sys.dont_write_bytecode = True
-sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../../../common/imp")) ) # get import pass : DSR_ROBOT.py 
+#sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../../../common/imp")) ) # get import pass : DSR_ROBOT.py 
 
 # for single robot 
 ROBOT_ID     = "dsr01"         # Robot Model & Robot ID identify namespace 
 ROBOT_MODEL  = "m1013"      
-import DR_init
+from DSR_ROBOT import *
 m_joyAnalogFlag = False
 m_xyCompareFlag = False
 m_joyButtonFlag = False
@@ -32,9 +32,9 @@ FLAG_JOG_STOP = 3
 
 FLAG_CONTROL = -1
 
-DR_init.__dsr__id = ROBOT_ID
-DR_init.__dsr__model = ROBOT_MODEL
-from DSR_ROBOT import *
+__dsr__id = ROBOT_ID
+__dsr__model = ROBOT_MODEL
+
 
 jog_multi = rospy.Publisher('/'+ROBOT_ID +ROBOT_MODEL+'/jog_multi', JogMultiAxis, queue_size=1) # Publish multi-jog topic
 

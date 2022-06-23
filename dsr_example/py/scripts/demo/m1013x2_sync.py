@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ##
 # @brief    [py demo]  muliti robot sync test
@@ -9,13 +9,13 @@ import os
 import threading, time
 import sys
 sys.dont_write_bytecode = True
-sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../../../common/imp")) ) # get import path : DSR_ROBOT.py 
+#sys.path.append( os.path.abspath(os.path.join(os.path.dirname(__file__),"../../../../common/imp")) ) # get import path : DSR_ROBOT.py 
 
 
 # for single robot 
-#import DR_init
-#DR_init.__dsr__id = "dsr01"
-#DR_init.__dsr__model = "m1013"
+#from DSR_ROBOT import *
+#__dsr__id = "dsr01"
+#__dsr__model = "m1013"
 #from DSR_ROBOT import *
 
 # for mulit robot 
