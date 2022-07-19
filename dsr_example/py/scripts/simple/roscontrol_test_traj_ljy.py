@@ -16,7 +16,7 @@ __dsr__model = ROBOT_MODEL
 
 
 ### Sellect the controller options: position and velocity controller are not implemented yet (those make some purterbation during the execution)
-control_type = "velocity" #"position" #"torque" # "gravity" #
+control_type = "gravity" # "velocity" #"position" #"gravity" #
 
 traj = Trajectory(6)
 traj_flag = [0]*6
@@ -48,10 +48,10 @@ elif control_type=="torque" or  control_type == "gravity":
 governor=rospy.Rate(rate)
 
 
-if control_type=="position":
+if control_type=="position": # manual phone picture
     cmd_pos=ServoJRTStream()
     cmd_pos.time=1/rate
-elif control_type=="velocity":
+elif control_type=="velocity": # https://github.com/doosan-robotics/doosan-robot/issues/99
     cmd_vel=SpeedJRTStream()
     cmd_vel.time=1/rate
 elif control_type == "torque" or control_type == "gravity" :
@@ -84,10 +84,10 @@ while not rospy.is_shutdown():
 
     if motion==1 and traj_flag[0]==0:
 #        trj_q=[0,0,90,0,90,0]
-        trj_q=[0,45,90,0,-45,0]
+        trj_q=[0,45,90,0,-45,0] # impedence control position
 #        trj_q=[90,45,90,0,-45,0]
-        motion+=1
-#        motion=0
+#        motion+=1
+        motion=0
         traj_flag=[1]*6
     elif motion==2 and traj_flag[0]==0:
         trj_q=[0,0,0,0,0,0]
@@ -164,26 +164,26 @@ while not rospy.is_shutdown():
         for i in range(6):
             tor_ext[i] = alpha*tor_ext_tmp[i] + (1-alpha)*buf_tor_ext[i];
             if i == 0:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i] #+3.5*tor_ext[i] # compliance factor 
             elif i == 1:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i] #3.5*tor_ext[i] # 10 kp, kd 0.1 more increse more rigid
             elif i == 2:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i] #3.5*tor_ext[i]
             elif i == 3:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+4*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i] #4*tor_ext[i]
             elif i == 4:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+5*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i] #5*tor_ext[i]
             elif i == 5:
-                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i]+6*tor_ext[i]
+                cmd_tor.tor[i] = 10*(qd[i]-q[i])+0.1*(qd_dot[i]-q_dot[i])+tor_g[i] #6*tor_ext[i]
             buf_tor_ext[i]=tor_ext[i]
         command.publish(cmd_tor)
 
         print(cmd_tor.tor)
 
-    elif control_type == "gravity":
+    elif control_type == "gravity": # compliance mode 100% = external = gravity compensation 
         for i in range(6):
             tor_ext[i] = alpha*tor_ext_tmp[i] + (1-alpha)*buf_tor_ext[i];
-            cmd_tor.tor[i] = tor_g[i]+2.5*tor_ext[i]
+            cmd_tor.tor[i] = tor_g[i]+2.5*tor_ext[i] # more smooth change to 6, it is filtered, not friction compensation mode , it more external torque geration
             buf_tor_ext[i]=tor_ext[i]
         command.publish(cmd_tor)
 

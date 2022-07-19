@@ -175,3 +175,8 @@ install(PROGRAMS scripts/simple/roscontrol_test.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 
 )
+
+install(PROGRAMS scripts/simple/dsr_simple_test_ljy.py
+   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+

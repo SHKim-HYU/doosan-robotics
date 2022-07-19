@@ -69,6 +69,7 @@
 #define NUM_FLANGE_IO            (6)
 #define NUM_BUTTON               (5)
 #define NUMBER_OF_TASK           (6)
+#define NUMBER_OF_BUTTON         (6)
 
 //
 // string constants
@@ -99,6 +100,12 @@
 
 #define MAX_CONFIG_TCP_SIZE         (50)
 #define MAX_CONFIG_TOOL_SIZE        (50)
+#define IS_NEW_FLANGE_VERSION(f) ((f[3] > '1') && ((f[2] == '0') || (f[2] == '1')))
+
+#define MIN_FLANGE_AI               2
+#define MAX_FLANGE_AI               4
+
+static float COG_DEFAULT[3] = {0.0, 0.0, 0.0};
 
 //
 // robot state enumerated value
@@ -539,6 +546,22 @@ enum {
     TYPE_OUTPUT,
     TYPE_LAST,
 };
+
+typedef enum{
+    COG_REFERENCE_TCP = 0,
+    COG_REFERENCE_FLANGE,
+} COG_REFERENCE;
+
+typedef enum{
+    ADD_UP_REPLACE = 0,
+    ADD_UP_ADD,
+    ADD_UP_REMOVE,
+} ADD_UP;
+
+typedef enum{
+    OUTPUT_TYPE_PNP = 0,
+    OUTPUT_TYPE_NPN,
+} OUTPUT_TYPE;
 
 //
 // safety mode enumerated value

@@ -1,6 +1,6 @@
 /*    ========================================================================
     =                   Doosan Robot Framework Library                        =
-    =                   Copyright (c) Doosan Robotics.                        =
+    =                   Copyright (c) Doosan Robotics.                        =   
     =_______________________________________________________________________  =
     = Title             : Doosan Robot Framwork Library                       =
     = Author            : Lee Jeong-Woo<jeongwoo1.lee@doosan.com>             =
@@ -62,14 +62,14 @@
 #include "DRFL.h"
 
 
-namespace DRAFramework
+namespace DRAFramework 
 {
     typedef void (*TOnMonitoringDataExCB)(const LPMONITORING_DATA_EX);
     typedef void (*TOnMonitoringCtrlIOExCB)(const LPMONITORING_CTRLIO_EX);
     typedef void (*TOnTpPopupCB)(LPMESSAGE_POPUP);
     typedef void (*TOnTpLogCB)(const char[256]);
     typedef void (*TOnTpGetUserInputCB)(LPMESSAGE_INPUT);
-    typedef void (*TOnTpProgressCB)(LPMESSAGE_PROGRESS);
+    typedef void (*TOnTpProgressCB)(LPMESSAGE_PROGRESS); 
 
     typedef void (*TOnRTMonitoringDataCB)(const LPRT_OUTPUT_DATA_LIST);
 
@@ -80,13 +80,13 @@ namespace DRAFramework
 
 
 #ifdef __cplusplus
-    extern "C"
+    extern "C" 
     {
 #endif
         //////////////////////
         /////DRL Wrapping/////
         //////////////////////
-
+        
         DRFL_API LPROBOTCONTROL _create_robot_control_udp();
         DRFL_API void _destroy_robot_control_udp(LPROBOTCONTROL pCtrl);
 
@@ -104,7 +104,7 @@ namespace DRAFramework
 
         ////////////////////////////////////////////////////////////////////////////
         // RT Control                                                             //
-        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////   
 
         DRFL_API const char* _get_rt_control_output_version_list(LPROBOTCONTROL pCtrl);
         DRFL_API const char* _get_rt_control_input_version_list(LPROBOTCONTROL pCtrl);
@@ -112,24 +112,24 @@ namespace DRAFramework
         DRFL_API const char* _get_rt_control_output_data_list(LPROBOTCONTROL pCtrl, const char* szVersion);
         DRFL_API bool _set_rt_control_input(LPROBOTCONTROL pCtrl, const char* szVersion, float fPeriod, int nLossCnt);
         DRFL_API bool _set_rt_control_output(LPROBOTCONTROL pCtrl, const char* szVersion, float fPeriod, int nLossCnt);
-
+        
         DRFL_API bool _start_rt_control(LPROBOTCONTROL pCtrl);
         DRFL_API bool _stop_rt_control(LPROBOTCONTROL pCtrl);
 
         DRFL_API bool _set_velj_rt(LPROBOTCONTROL pCtrl, float fTargetVel[NUM_JOINT]);
         DRFL_API bool _set_accj_rt(LPROBOTCONTROL pCtrl, float fTargetAcc[NUM_JOINT]);
-        DRFL_API bool _set_velx_rt(LPROBOTCONTROL pCtrl, float fTransVel, float fRotationVel);
-        DRFL_API bool _set_accx_rt(LPROBOTCONTROL pCtrl, float fTransAcc, float fRotationAcc);
+        DRFL_API bool _set_velx_rt(LPROBOTCONTROL pCtrl, float fTransVel, float fRotationVel = -10000);
+        DRFL_API bool _set_accx_rt(LPROBOTCONTROL pCtrl, float fTransAcc, float fRotationAcc = -10000);
 
         DRFL_API LPRT_OUTPUT_DATA_LIST _read_data_rt(LPROBOTCONTROL pCtrl);
         DRFL_API bool _write_data_rt(LPROBOTCONTROL pCtrl, float fExternalForceTorque[NUM_JOINT], int iExternalDI, int iExternalDO, float fExternalAnalogInput[6], float fExternalAnalogOutput[6]);
-
+        
         DRFL_API bool _servoj_rt(LPROBOTCONTROL pCtrl, float fTargetPos[NUM_JOINT], float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime);
         DRFL_API bool _servol_rt(LPROBOTCONTROL pCtrl, float fTargetPos[NUM_TASK], float fTargetVel[NUM_TASK], float fTargetAcc[NUM_TASK], float fTargetTime);
         DRFL_API bool _speedj_rt(LPROBOTCONTROL pCtrl, float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime);
         DRFL_API bool _speedl_rt(LPROBOTCONTROL pCtrl, float fTargetVel[NUM_TASK], float fTargetAcc[NUM_TASK], float fTargetTime);
         DRFL_API bool _torque_rt(LPROBOTCONTROL pCtrl, float fMotorTor[NUM_JOINT], float fTargetTime);
-        //DRFL_API bool _change_operation_speed_rt(LPROBOTCONTROL pCtrl, float fSpeedRate); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        //DRFL_API bool _change_operation_speed_rt(LPROBOTCONTROL pCtrl, float fSpeedRate); // Â÷ÈÄ °³¹ß
 
 
         ////////////////////////////////////////////////////////////////////////////
@@ -144,19 +144,19 @@ namespace DRAFramework
         // set robot mode mode(manual, auto)
         DRFL_API bool _set_robot_mode(LPROBOTCONTROL pCtrl, ROBOT_MODE eMode);
 
-       // get robot state( initial, standby, moving, safe-off, teach, ...)
+       // get robot state( initial, standby, moving, safe-off, teach, ...) 
         DRFL_API ROBOT_STATE _get_robot_state(LPROBOTCONTROL pCtrl);
         // set robot control state
         DRFL_API bool _set_robot_control(LPROBOTCONTROL pCtrl, ROBOT_CONTROL eControl);
         DRFL_API CONTROL_MODE _get_control_mode(LPROBOTCONTROL pCtrl);
-
+        
         // get robot system(real robot, virtrul robot)
         DRFL_API ROBOT_SYSTEM _get_robot_system(LPROBOTCONTROL pCtrl);
         // set robot system(real robot, virtrul robot)
         DRFL_API bool _set_robot_system(LPROBOTCONTROL pCtrl, ROBOT_SYSTEM eRobotSystem);
 
         // set robot speed mode(noraml reduced)
-        DRFL_API bool _set_robot_speed_mode(LPROBOTCONTROL pCtrl, SPEED_MODE eSpeedMode);
+        DRFL_API bool _set_robot_speed_mode(LPROBOTCONTROL pCtrl, SPEED_MODE eSpeedMode);      
         // get robot speed mode(noraml reduced)
         DRFL_API SPEED_MODE _get_robot_speed_mode(LPROBOTCONTROL pCtrl);
 
@@ -165,10 +165,10 @@ namespace DRAFramework
 
         // get rotation matrix
         DRFL_API float(* _get_current_rotm(LPROBOTCONTROL pCtrl, COORDINATE_SYSTEM eTargetRef))[3];
-
+        
         // get current solution space
         DRFL_API unsigned char _get_current_solution_space(LPROBOTCONTROL pCtrl);
-
+        
         // get current joint position list
         DRFL_API LPROBOT_POSE _get_current_posj(LPROBOTCONTROL pCtrl);
         // get current control space
@@ -199,20 +199,20 @@ namespace DRAFramework
         DRFL_API bool _set_safe_stop_reset_type(LPROBOTCONTROL pCtrl, SAFE_STOP_RESET_TYPE eResetType = SAFE_STOP_RESET_TYPE_DEFAULT);
 
         // get robot system alarm
-        DRFL_API LPLOG_ALARM _get_last_alarm(LPROBOTCONTROL pCtrl);
-
+        DRFL_API LPLOG_ALARM _get_last_alarm(LPROBOTCONTROL pCtrl);        
+                
         ////////////////////////////////////////////////////////////////////////////
         //  access control                                                       //
         ////////////////////////////////////////////////////////////////////////////
 
         // manage access control
         DRFL_API bool _manage_access_control(LPROBOTCONTROL pCtrl, MANAGE_ACCESS_CONTROL eAccessControl = MANAGE_ACCESS_CONTROL_REQUEST);
-
+        
         ////////////////////////////////////////////////////////////////////////////
         // Callback operation                                                    //
         ////////////////////////////////////////////////////////////////////////////
         DRFL_API void _set_on_monitoring_state(LPROBOTCONTROL pCtrl, TOnMonitoringStateCB pCallbackFunc);
-        DRFL_API void _set_on_monitoring_data(LPROBOTCONTROL pCtrl, TOnMonitoringDataCB pCallbackFunc);
+        DRFL_API void _set_on_monitoring_data(LPROBOTCONTROL pCtrl, TOnMonitoringDataCB pCallbackFunc);   
         DRFL_API void _set_on_monitoring_data_ex(LPROBOTCONTROL pCtrl, TOnMonitoringDataExCB pCallbackFunc);
         DRFL_API void _set_on_monitoring_ctrl_io(LPROBOTCONTROL pCtrl, TOnMonitoringCtrlIOCB pCallbackFunc);
         DRFL_API void _set_on_monitoring_ctrl_io_ex(LPROBOTCONTROL pCtrl, TOnMonitoringCtrlIOExCB pCallbackFunc);
@@ -242,7 +242,7 @@ namespace DRAFramework
         DRFL_API LPROBOT_POSE _ikin(LPROBOTCONTROL pCtrl, float fSourcePos[NUM_TASK], unsigned char iSolutionSpace, COORDINATE_SYSTEM eTargetRef = COORDINATE_SYSTEM_BASE);
 		DRFL_API LPINVERSE_KINEMATIC_RESPONSE _ikin_ex(LPROBOTCONTROL pCtrl, float fSourcePos[NUM_TASK], unsigned char iSolutionSpace, COORDINATE_SYSTEM eTargetRef, unsigned char iRefPosOpt);
         DRFL_API LPROBOT_POSE _fkin(LPROBOTCONTROL pCtrl, float fSourcePos[NUM_JOINT], COORDINATE_SYSTEM eTargetRef = COORDINATE_SYSTEM_BASE);
-
+        
         DRFL_API unsigned char _get_solution_space(LPROBOTCONTROL pCtrl, float fTargetPos[NUM_TASK]);
 
         DRFL_API LPROBOT_TASK_POSE _get_current_posx(LPROBOTCONTROL pCtrl, COORDINATE_SYSTEM eCoodType = COORDINATE_SYSTEM_BASE);
@@ -250,10 +250,11 @@ namespace DRAFramework
         DRFL_API float _get_orientation_error(LPROBOTCONTROL pCtrl, float fPosition1[NUM_TASK], float fPosition2[NUM_TASK], TASK_AXIS eTaskAxis);
 
         DRFL_API double _get_override_speed(LPROBOTCONTROL pCtrl);
-
+        
+        DRFL_API bool _set_workpiece_weight(LPROBOTCONTROL pCtrl, float fWeight = 0.0, float fCog[3] = COG_DEFAULT, COG_REFERENCE eCogRef = COG_REFERENCE_TCP, ADD_UP eAddUp = ADD_UP_REPLACE, float fStartTime = -10000, float fTransitionTIme = -10000);
         DRFL_API float _get_workpiece_weight(LPROBOTCONTROL pCtrl);
         DRFL_API bool _reset_workpiece_weight(LPROBOTCONTROL pCtrl);
-
+         
         DRFL_API bool _tp_popup_response(LPROBOTCONTROL pCtrl, POPUP_RESPONSE eRes);
         DRFL_API bool _tp_get_user_input_response(LPROBOTCONTROL pCtrl, const char* lpszTextString);
         ////////////////////////////////////////////////////////////////////////////
@@ -311,6 +312,14 @@ namespace DRAFramework
         DRFL_API bool _speedj(LPROBOTCONTROL pCtrl, float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime);
         DRFL_API bool _speedl(LPROBOTCONTROL pCtrl, float fTargetVel[NUM_TASK], float fTargetAcc[2], float fTargetTime);
 
+
+        DRFL_API bool _servoj_g(LPROBOTCONTROL pCtrl, float fTargetPos[NUM_JOINT], float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime);
+        DRFL_API bool _servol_g(LPROBOTCONTROL pCtrl, float fTargetPos[NUM_TASK], float fTargetVel[2], float fTargetAcc[2], float fTargetTime);
+
+        DRFL_API bool _movesx_g(LPROBOTCONTROL pCtrl, float fTargetPos[MAX_SPLINE_POINT][NUM_TASK], unsigned char nPosCount, float fTargetVel[2], float fTargetAcc[2], float fTargetTime /* = 0.f */, MOVE_MODE eMoveMode /* = MOVE_MODE_ABSOLUTE */, MOVE_REFERENCE eMoveReference /* = MOVE_REFERENCE_BASE */, SPLINE_VELOCITY_OPTION eVelOpt /* = SPLINE_VELOCITY_OPTION_DEFAULT */);
+        DRFL_API bool _movesj_g(LPROBOTCONTROL pCtrl, float fTargetPos[MAX_SPLINE_POINT][NUM_JOINT], unsigned char nPosCount, float fTargetVel, float fTargetAcc, float fTargetTime /* = 0.f */, MOVE_MODE eMoveMode /* = MOVE_MODE_ABSOLUTE */);
+
+
         ////////////////////////////////////////////////////////////////////////////
         //  GPIO Operations                                                       //
         ////////////////////////////////////////////////////////////////////////////
@@ -331,14 +340,20 @@ namespace DRAFramework
         DRFL_API float _get_analog_input(LPROBOTCONTROL pCtrl, GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex);
 
         // set analog input type on control-box
-        DRFL_API bool _set_mode_analog_input(LPROBOTCONTROL pCtrl, GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex, GPIO_ANALOG_TYPE eAnalogType = GPIO_ANALOG_TYPE_CURRENT);
+        DRFL_API bool _set_mode_analog_input(LPROBOTCONTROL pCtrl, GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex, GPIO_ANALOG_TYPE eAnalogType = GPIO_ANALOG_TYPE_CURRENT); 
         // set analog output type on control-box
-        DRFL_API bool _set_mode_analog_output(LPROBOTCONTROL pCtrl, GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex, GPIO_ANALOG_TYPE eAnalogType = GPIO_ANALOG_TYPE_CURRENT);
+        DRFL_API bool _set_mode_analog_output(LPROBOTCONTROL pCtrl, GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex, GPIO_ANALOG_TYPE eAnalogType = GPIO_ANALOG_TYPE_CURRENT); 
+        
+        DRFL_API float _get_tool_analog_input(LPROBOTCONTROL pCtrl, int nCh);
+        DRFL_API bool _set_tool_digital_output_level(LPROBOTCONTROL pCtrl, int nLv);
+        DRFL_API bool _set_tool_digital_output_type(LPROBOTCONTROL pCtrl, int nPort, OUTPUT_TYPE eOutputType);
+        DRFL_API bool _set_mode_tool_analog_input(LPROBOTCONTROL pCtrl, int nCh, GPIO_ANALOG_TYPE eAnalogType);
+
 
         ////////////////////////////////////////////////////////////////////////////
         //  Modbus Operations                                                     //
         ////////////////////////////////////////////////////////////////////////////
-        // set modbus register
+        // set modbus register 
         DRFL_API bool _set_modbus_output(LPROBOTCONTROL pCtrl, const char* lpszSymbol, unsigned short nValue);
         // get modbus register
         DRFL_API unsigned short _get_modbus_input(LPROBOTCONTROL pCtrl, const char* lpszSymbol);
@@ -350,10 +365,10 @@ namespace DRAFramework
         ////////////////////////////////////////////////////////////////////////////
         //  Flange Serial Operations                                              //
         ////////////////////////////////////////////////////////////////////////////
-        DRFL_API bool _flange_serial_open(LPROBOTCONTROL pCtrl, int baudrate, BYTE_SIZE eByteSize = BYTE_SIZE_EIGHTBITS, PARITY_CHECK eParity = PARITY_CHECK_NONE, STOP_BITS eStopBits = STOPBITS_ONE);
+        DRFL_API bool _flange_serial_open(LPROBOTCONTROL pCtrl, int baudrate = 115200, BYTE_SIZE eByteSize = BYTE_SIZE_EIGHTBITS, PARITY_CHECK eParity = PARITY_CHECK_NONE, STOP_BITS eStopBits = STOPBITS_ONE);
         DRFL_API bool _flange_serial_close(LPROBOTCONTROL pCtrl);
-        DRFL_API bool _flange_serial_write(LPROBOTCONTROL pCtrl, int nSize, char* pSendData);
-        DRFL_API LPFLANGE_SER_RXD_INFO _flange_serial_read(LPROBOTCONTROL pCtrl, float fTimeout = -1);
+        DRFL_API bool _flange_serial_write(LPROBOTCONTROL pCtrl, int nSize, char* pSendData, int nPort = 1);
+        DRFL_API LPFLANGE_SER_RXD_INFO _flange_serial_read(LPROBOTCONTROL pCtrl, float fTimeout = -1, int nPort = 1);     
 
         ////////////////////////////////////////////////////////////////////////////
         //  Configuration Operations                                               //
@@ -374,16 +389,16 @@ namespace DRAFramework
         // del robot tcp information
         DRFL_API bool _del_tcp(LPROBOTCONTROL pCtrl, const char* lpszSymbol);
         // get robot tcp information
-        DRFL_API const char* _get_tcp(LPROBOTCONTROL pCtrl);
+        DRFL_API const char* _get_tcp(LPROBOTCONTROL pCtrl);  
 
         DRFL_API bool _set_tool_shape(LPROBOTCONTROL pCtrl, const char* lpszSymbol);
         DRFL_API bool _add_tool_shape(LPROBOTCONTROL pCtrl, const char* lpszSymbol);
         DRFL_API bool _del_tool_shape(LPROBOTCONTROL pCtrl, const char* lpszSymbol);
-        DRFL_API const char* _get_tool_shape(LPROBOTCONTROL pCtrl);
-
+        DRFL_API const char* _get_tool_shape(LPROBOTCONTROL pCtrl);  
+        
         DRFL_API bool _set_user_home(LPROBOTCONTROL pCtrl);
 
-        DRFL_API int _servo_off(LPROBOTCONTROL pCtrl, STOP_TYPE eStopType);
+        DRFL_API int _servo_off(LPROBOTCONTROL pCtrl, STOP_TYPE eStopType);      
         DRFL_API int _check_motion(LPROBOTCONTROL pCtrl);
 
         DRFL_API bool _release_protective_stop(LPROBOTCONTROL pCtrl, RELEASE_MODE eReleaseMode);
@@ -399,8 +414,8 @@ namespace DRAFramework
 
         DRFL_API bool _change_collision_sensitivity(LPROBOTCONTROL pCtrl, float fSensitivity);
 
-
-
+        
+        
         ////////////////////////////////////////////////////////////////////////////
         //  drl program Operations                                                //
         ////////////////////////////////////////////////////////////////////////////
@@ -418,7 +433,7 @@ namespace DRAFramework
         ////////////////////////////////////////////////////////////////////////////
         //  force control                                                        //
         ////////////////////////////////////////////////////////////////////////////
-
+        
         DRFL_API bool _task_compliance_ctrl(LPROBOTCONTROL pCtrl, float fTargetStiffness[NUM_TASK], COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL, float fTargetTime = 0.f);
         DRFL_API bool _joint_compliance_ctrl(LPROBOTCONTROL pCtrl, float fTargetStiffness[NUM_TASK], float fTargetTime = 0.f);
         DRFL_API bool _set_stiffnessx(LPROBOTCONTROL pCtrl, float fTargetStiffness[NUM_TASK], COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL, float fTargetTime = 0.f);
@@ -434,7 +449,7 @@ namespace DRAFramework
         DRFL_API bool _check_orientation_condition_abs(LPROBOTCONTROL pCtrl, FORCE_AXIS eForceAxis, float fTargetMin[NUM_TASK], float fTargetMax[NUM_TASK], COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL);
         DRFL_API bool _check_orientation_condition_rel(LPROBOTCONTROL pCtrl, FORCE_AXIS eForceAxis, float fTargetMin, float fTargetMax, float fTargetPos[NUM_TASK], COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL);
         DRFL_API bool _is_done_bolt_tightening(LPROBOTCONTROL pCtrl, FORCE_AXIS eForceAxis, float fTargetTor = 0.f, float fTimeout = 0.f);
-
+        
         DRFL_API bool _parallel_axis1(LPROBOTCONTROL pCtrl, float fTargetPos1[NUM_TASK], float fTargetPos2[NUM_TASK], float fTargetPos3[NUM_TASK], TASK_AXIS eTaskAxis, COORDINATE_SYSTEM eSourceRef = COORDINATE_SYSTEM_BASE);
         DRFL_API bool _align_axis1(LPROBOTCONTROL pCtrl, float fTargetPos1[NUM_TASK], float fTargetPos2[NUM_TASK], float fTargetPos3[NUM_TASK], float fSourceVec[3], TASK_AXIS eTaskAxis, COORDINATE_SYSTEM eSourceRef = COORDINATE_SYSTEM_BASE);
         DRFL_API bool _parallel_axis2(LPROBOTCONTROL pCtrl, float fTargetVec[3], TASK_AXIS eTaskAxis, COORDINATE_SYSTEM eSourceRef = COORDINATE_SYSTEM_BASE);
@@ -442,7 +457,7 @@ namespace DRAFramework
         ////////////////////////////////////////////////////////////////////////////
         //  coordinate system control                                             //
         ////////////////////////////////////////////////////////////////////////////
-
+        
         DRFL_API int _set_user_cart_coord1(LPROBOTCONTROL pCtrl, int iReqId, float fTargetPos[NUM_TASK], COORDINATE_SYSTEM eTargetRef = COORDINATE_SYSTEM_BASE);
         DRFL_API int _set_user_cart_coord2(LPROBOTCONTROL pCtrl, float fTargetPos[3][NUM_TASK], float fTargetOrg[3], COORDINATE_SYSTEM fTargetRef);
         DRFL_API int _set_user_cart_coord3(LPROBOTCONTROL pCtrl, float fTargetVec[2][3], float fTargetOrg[3], COORDINATE_SYSTEM fTargetRef);
@@ -480,7 +495,7 @@ namespace DRAFramework
 
         ////////////////////////////////////////////////////////////////////////////
         // RT Control                                                             //
-        ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////   
 
         string get_rt_control_output_version_list() { return _get_rt_control_output_version_list(_rbtCtrlUDP); };
         string get_rt_control_input_version_list() { return _get_rt_control_input_version_list(_rbtCtrlUDP); };
@@ -491,21 +506,21 @@ namespace DRAFramework
 
         bool start_rt_control(){ return _start_rt_control(_rbtCtrlUDP); };
         bool stop_rt_control(){ return _stop_rt_control(_rbtCtrlUDP); };
-
+        
         bool set_velj_rt(float vel[NUM_JOINT]){ return _set_velj_rt(_rbtCtrlUDP, vel); };
         bool set_accj_rt(float acc[NUM_JOINT]){ return _set_accj_rt(_rbtCtrlUDP, acc); };
-        bool set_velx_rt(float fTransVel, float fRotationVel){ return _set_velx_rt(_rbtCtrlUDP, fTransVel, fRotationVel); };
-        bool set_accx_rt(float fTransAcc, float fRotationAcc){ return _set_accx_rt(_rbtCtrlUDP, fTransAcc, fRotationAcc); };
+        bool set_velx_rt(float fTransVel, float fRotationVel = -10000){ return _set_velx_rt(_rbtCtrlUDP, fTransVel, fRotationVel); };
+        bool set_accx_rt(float fTransAcc, float fRotationAcc = -10000){ return _set_accx_rt(_rbtCtrlUDP, fTransAcc, fRotationAcc); };
 
         LPRT_OUTPUT_DATA_LIST read_data_rt(){ return _read_data_rt(_rbtCtrlUDP); };
         bool write_data_rt(float fExternalForceTorque[NUM_JOINT], int iExternalDI, int iExternalDO, float fExternalAnalogInput[6], float fExternalAnalogOutput[6]){ return _write_data_rt(_rbtCtrlUDP, fExternalForceTorque, iExternalDI, iExternalDO, fExternalAnalogInput, fExternalAnalogOutput); };
-
+        
         bool servoj_rt(float fTargetPos[NUM_JOINT], float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime){ return _servoj_rt(_rbtCtrlUDP, fTargetPos, fTargetVel, fTargetAcc, fTargetTime); };
         bool servol_rt(float fTargetPos[NUM_TASK], float fTargetVel[NUM_TASK], float fTargetAcc[NUM_TASK], float fTargetTime){ return _servol_rt(_rbtCtrlUDP, fTargetPos, fTargetVel, fTargetAcc, fTargetTime); };
         bool speedj_rt(float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime){ return _speedj_rt(_rbtCtrlUDP, fTargetVel, fTargetAcc, fTargetTime); };
         bool speedl_rt(float fTargetVel[NUM_TASK], float fTargetAcc[NUM_TASK], float fTargetTime){ return _speedl_rt(_rbtCtrlUDP, fTargetVel, fTargetAcc, fTargetTime); };
         bool torque_rt(float fMotorTor[NUM_JOINT], float fTargetTime){ return _torque_rt(_rbtCtrlUDP, fMotorTor, fTargetTime); };
-        //bool change_operation_speed_rt(float fSpeedRate){ return _change_operation_speed_rt(_rbtCtrlUDP, fSpeedRate); }; //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        //bool change_operation_speed_rt(float fSpeedRate){ return _change_operation_speed_rt(_rbtCtrlUDP, fSpeedRate); }; //Â÷ÈÄ °³¹ß
 
 
         ////////////////////////////////////////////////////////////////////////////
@@ -546,7 +561,7 @@ namespace DRAFramework
         // program stopeed event
         void set_on_program_stopped(TOnProgramStoppedCB pCallbackFunc) { _set_on_program_stopped(_rbtCtrl, pCallbackFunc); };
         // robot disconneted event
-        void set_on_disconnected(TOnDisconnectedCB pCallbackFunc) { _set_on_disconnected(_rbtCtrl, pCallbackFunc); };
+        void set_on_disconnected(TOnDisconnectedCB pCallbackFunc) { _set_on_disconnected(_rbtCtrl, pCallbackFunc); };    
 
         void set_on_monitoring_safety_state(TOnMonitoringSafetyStateCB pCallbackFunc) { _set_on_monitoring_safety_state(_rbtCtrl, pCallbackFunc); };
         void set_on_monitoring_robot_system(TOnMonitoringRobotSystemCB pCallbackFunc) { _set_on_monitoring_robot_system(_rbtCtrl, pCallbackFunc); };
@@ -559,20 +574,21 @@ namespace DRAFramework
         LPROBOT_POSE trans(float fSourcePos[NUM_TASK], float fOffset[NUM_TASK], COORDINATE_SYSTEM eSourceRef = COORDINATE_SYSTEM_BASE, COORDINATE_SYSTEM eTargetRef = COORDINATE_SYSTEM_BASE){return _trans(_rbtCtrl, fSourcePos, fOffset, eSourceRef, eTargetRef);};
         LPROBOT_POSE ikin(float fSourcePos[NUM_TASK], unsigned char iSolutionSpace, COORDINATE_SYSTEM eTargetRef = COORDINATE_SYSTEM_BASE){return _ikin(_rbtCtrl, fSourcePos, iSolutionSpace, eTargetRef); };
 		LPINVERSE_KINEMATIC_RESPONSE ikin(float fSourcePos[NUM_TASK], unsigned char iSolutionSpace, COORDINATE_SYSTEM eTargetRef, unsigned char iRefPosOpt){return _ikin_ex(_rbtCtrl, fSourcePos, iSolutionSpace, eTargetRef, iRefPosOpt); };
-		LPROBOT_POSE fkin(float fSourcePos[NUM_JOINT], COORDINATE_SYSTEM eTargetRef = COORDINATE_SYSTEM_BASE){return _fkin(_rbtCtrl, fSourcePos, eTargetRef); };
+		LPROBOT_POSE fkin(float fSourcePos[NUM_JOINT], COORDINATE_SYSTEM eTargetRef = COORDINATE_SYSTEM_BASE){return _fkin(_rbtCtrl, fSourcePos, eTargetRef); };        
 
         unsigned char get_solution_space(float fTargetPos[NUM_JOINT]){ return _get_solution_space(_rbtCtrl, fTargetPos);};
         LPROBOT_TASK_POSE get_current_posx(COORDINATE_SYSTEM eCoodType = COORDINATE_SYSTEM_BASE){return _get_current_posx(_rbtCtrl, eCoodType); };
         LPROBOT_POSE get_desired_posx(COORDINATE_SYSTEM eCoodType = COORDINATE_SYSTEM_BASE){return _get_desired_posx(_rbtCtrl, eCoodType);};
         float get_orientation_error(float fPosition1[NUM_TASK], float fPosition2[NUM_TASK], TASK_AXIS eTaskAxis){return _get_orientation_error(_rbtCtrl, fPosition1, fPosition2, eTaskAxis); };
 
-        double get_override_speed(){return _get_override_speed(_rbtCtrl);};
+        //double get_override_speed(){return _get_override_speed(_rbtCtrl);};
 
+        bool set_workpiece_weight(float fWeight = 0.0, float fCog[3] = COG_DEFAULT, COG_REFERENCE eCogRef = COG_REFERENCE_TCP, ADD_UP eAddUp = ADD_UP_REPLACE, float fStartTime = -10000, float fTransitionTIme = -10000){return _set_workpiece_weight(_rbtCtrl, fWeight, fCog, eCogRef, eAddUp, fStartTime, fTransitionTIme); };
         float get_workpiece_weight(){return _get_workpiece_weight(_rbtCtrl);};
         bool reset_workpiece_weight(){return _reset_workpiece_weight(_rbtCtrl);};
         bool tp_popup_response(POPUP_RESPONSE eRes){return _tp_popup_response(_rbtCtrl, eRes);};
         bool tp_get_user_input_response(string strUserInput){return _tp_get_user_input_response(_rbtCtrl, strUserInput.c_str());};
-
+      
         ////////////////////////////////////////////////////////////////////////////
         // Attributes                                                             //
         ////////////////////////////////////////////////////////////////////////////
@@ -585,9 +601,9 @@ namespace DRAFramework
         // set robot mode mode(manual, auto)
         bool set_robot_mode(ROBOT_MODE eMode) { return _set_robot_mode(_rbtCtrl, eMode); };
 
-        // get robot state( initial, standby, moving, safe-off, teach, ...)
+        // get robot state( initial, standby, moving, safe-off, teach, ...) 
         ROBOT_STATE get_robot_state() { return _get_robot_state(_rbtCtrl); };
-        // set robot state
+        // set robot state 
         bool set_robot_control(ROBOT_CONTROL eControl) { return _set_robot_control(_rbtCtrl, eControl); };
         CONTROL_MODE get_control_mode(){ return _get_control_mode(_rbtCtrl);};
         // get robot system(real robot, virtrul robot)
@@ -599,7 +615,7 @@ namespace DRAFramework
         bool set_robot_speed_mode(SPEED_MODE eSpeedMode) { return _set_robot_speed_mode(_rbtCtrl, eSpeedMode); };
         // get robot speed mode(noraml reduced)
         SPEED_MODE get_robot_speed_mode() { return _get_robot_speed_mode(_rbtCtrl); };
-
+        
         // get roobt axis data
         LPROBOT_POSE get_current_pose(ROBOT_SPACE eSpaceType = ROBOT_SPACE_JOINT) { return _get_current_pose(_rbtCtrl, eSpaceType); };
         float(* get_current_rotm(COORDINATE_SYSTEM eTargetRef = COORDINATE_SYSTEM_BASE))[3]{ return _get_current_rotm(_rbtCtrl, eTargetRef); };
@@ -619,7 +635,7 @@ namespace DRAFramework
         // get target task position
         //LPROBOT_POSE get_desired_posx() { return _GetDesiredPosX(_rbtCtrl); };
         // get target task velocity
-        LPROBOT_VEL get_desired_velx() { return _get_desired_velx(_rbtCtrl); };
+        LPROBOT_VEL get_desired_velx() { return _get_desired_velx(_rbtCtrl); }; 
         // get current joint sensor torque value
         LPROBOT_FORCE get_joint_torque() { return _get_joint_torque(_rbtCtrl); };
         // get current external force
@@ -631,18 +647,18 @@ namespace DRAFramework
         DRL_PROGRAM_STATE get_program_state() { return _get_program_state(_rbtCtrl); };
 
         // set safe-stop reset type
-        bool set_safe_stop_reset_type(SAFE_STOP_RESET_TYPE eResetType = SAFE_STOP_RESET_TYPE_DEFAULT) { return(_set_safe_stop_reset_type(_rbtCtrl, eResetType)); }
+        bool set_safe_stop_reset_type(SAFE_STOP_RESET_TYPE eResetType = SAFE_STOP_RESET_TYPE_DEFAULT) { _set_safe_stop_reset_type(_rbtCtrl, eResetType); }
 
         // get roobot system alarm
         LPLOG_ALARM get_last_alarm() { return _get_last_alarm(_rbtCtrl); };
-
+        
         ////////////////////////////////////////////////////////////////////////////
         //  access control                                                        //
         ////////////////////////////////////////////////////////////////////////////
 
         // manage access control
         bool manage_access_control(MANAGE_ACCESS_CONTROL eAccessControl = MANAGE_ACCESS_CONTROL_REQUEST) { return _manage_access_control(_rbtCtrl, eAccessControl); };
-
+        
         ////////////////////////////////////////////////////////////////////////////
         //  motion Operations                                                     //
         ////////////////////////////////////////////////////////////////////////////
@@ -659,7 +675,7 @@ namespace DRAFramework
         // wait motion
         bool mwait() { return _mwait(_rbtCtrl); };
 
-
+        
         // motion control: joint move
         bool movej(float fTargetPos[NUM_JOINT], float fTargetVel, float fTargetAcc, float fTargetTime = 0.f, MOVE_MODE eMoveMode = MOVE_MODE_ABSOLUTE, float fBlendingRadius = 0.f, BLENDING_SPEED_TYPE eBlendingType = BLENDING_SPEED_TYPE_DUPLICATE) { return _movej(_rbtCtrl, fTargetPos, fTargetVel, fTargetAcc, fTargetTime, eMoveMode, fBlendingRadius, eBlendingType); };
         bool movej(float fTargetPos[NUM_JOINT], float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime = 0.f, MOVE_MODE eMoveMode = MOVE_MODE_ABSOLUTE, float fBlendingRadius = 0.f, BLENDING_SPEED_TYPE eBlendingType = BLENDING_SPEED_TYPE_DUPLICATE) { return _movej_ex(_rbtCtrl, fTargetPos, fTargetVel, fTargetAcc, fTargetTime, eMoveMode, fBlendingRadius, eBlendingType); };
@@ -690,13 +706,21 @@ namespace DRAFramework
         // motion control: move periodic motion
         bool move_periodic(float fAmplitude[NUM_TASK], float fPeriodic[NUM_TASK], float fAccelTime, unsigned int nRepeat, MOVE_REFERENCE eMoveReference = MOVE_REFERENCE_TOOL) { return _move_periodic(_rbtCtrl, fAmplitude, fPeriodic, fAccelTime, nRepeat, eMoveReference); };
         bool amove_periodic(float fAmplitude[NUM_TASK], float fPeriodic[NUM_TASK], float fAccelTime, unsigned int nRepeat, MOVE_REFERENCE eMoveReference = MOVE_REFERENCE_TOOL) { return _amove_periodic(_rbtCtrl, fAmplitude, fPeriodic, fAccelTime, nRepeat, eMoveReference); };
-
+		
         // environment adaptive motion
         bool servoj(float fTargetPos[NUM_JOINT], float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime){ return _servoj(_rbtCtrl, fTargetPos, fTargetVel, fTargetAcc, fTargetTime); };
         bool servol(float fTargetPos[NUM_TASK], float fTargetVel[2], float fTargetAcc[2], float fTargetTime){ return _servol(_rbtCtrl, fTargetPos, fTargetVel, fTargetAcc, fTargetTime); };
 
         bool speedj(float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime){ return _speedj(_rbtCtrl, fTargetVel, fTargetAcc, fTargetTime); };
         bool speedl(float fTargetVel[NUM_TASK], float fTargetAcc[2], float fTargetTime){ return _speedl(_rbtCtrl, fTargetVel, fTargetAcc, fTargetTime); };
+
+        bool servoj_g(float fTargetPos[NUM_JOINT], float fTargetVel[NUM_JOINT], float fTargetAcc[NUM_JOINT], float fTargetTime=0.f){ return _servoj_g(_rbtCtrl, fTargetPos, fTargetVel, fTargetAcc, fTargetTime); };
+        bool servol_g(float fTargetPos[NUM_TASK], float fTargetVel[2], float fTargetAcc[2], float fTargetTime=0.f){ return _servol_g(_rbtCtrl, fTargetPos, fTargetVel, fTargetAcc, fTargetTime); };
+
+        bool movesx_g(float fTargetPos[MAX_SPLINE_POINT][NUM_TASK], unsigned char nPosCount, float fTargetVel[2], float fTargetAcc[2], float fTargetTime = 0.f, MOVE_MODE eMoveMode = MOVE_MODE_ABSOLUTE, MOVE_REFERENCE eMoveReference = MOVE_REFERENCE_BASE, SPLINE_VELOCITY_OPTION eVelOpt = SPLINE_VELOCITY_OPTION_DEFAULT) { return _movesx_g(_rbtCtrl, fTargetPos, nPosCount, fTargetVel, fTargetAcc, fTargetTime, eMoveMode, eMoveReference, eVelOpt); };
+        bool movesj_g(float fTargetPos[MAX_SPLINE_POINT][NUM_JOINT], unsigned char nPosCount, float fTargetVel, float fTargetAcc, float fTargetTime = 0.f, MOVE_MODE eMoveMode = MOVE_MODE_ABSOLUTE) { return _movesj_g(_rbtCtrl, fTargetPos, nPosCount, fTargetVel, fTargetAcc, fTargetTime, eMoveMode); };
+
+
 
         ////////////////////////////////////////////////////////////////////////////
         //  GPIO Operations                                                       //
@@ -717,9 +741,15 @@ namespace DRAFramework
         // get analog inut on control-box
         float get_analog_input(GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex) { return _get_analog_input(_rbtCtrl, eGpioIndex); };
         // set analog input type on control-box
-        bool set_mode_analog_input(GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex, GPIO_ANALOG_TYPE eAnalogType = GPIO_ANALOG_TYPE_CURRENT) { return _set_mode_analog_input(_rbtCtrl, eGpioIndex, eAnalogType); };
+        bool set_mode_analog_input(GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex, GPIO_ANALOG_TYPE eAnalogType = GPIO_ANALOG_TYPE_CURRENT) { return _set_mode_analog_input(_rbtCtrl, eGpioIndex, eAnalogType); }; 
         // set analog output type on control-box
         bool set_mode_analog_output(GPIO_CTRLBOX_ANALOG_INDEX eGpioIndex, GPIO_ANALOG_TYPE eAnalogType = GPIO_ANALOG_TYPE_CURRENT) { return _set_mode_analog_output(_rbtCtrl, eGpioIndex, eAnalogType); };
+
+        float get_tool_analog_input(int nCh){ return _get_tool_analog_input(_rbtCtrl, nCh); };
+        bool set_tool_digital_output_level(int nLv){ return _set_tool_digital_output_level(_rbtCtrl, nLv); };
+        bool set_tool_digital_output_type(int nPort, OUTPUT_TYPE eOutputType){ return _set_tool_digital_output_type(_rbtCtrl, nPort, eOutputType); };
+        bool set_mode_tool_analog_input(int nCh, GPIO_ANALOG_TYPE eAnalogType){ return _set_mode_tool_analog_input(_rbtCtrl, nCh, eAnalogType); };
+        
 
         ////////////////////////////////////////////////////////////////////////////
         //  Modbus Operations                                                     //
@@ -736,10 +766,10 @@ namespace DRAFramework
         ////////////////////////////////////////////////////////////////////////////
         //  Flange Serial Operations                                              //
         ////////////////////////////////////////////////////////////////////////////
-        bool flange_serial_open(int baudrate, BYTE_SIZE eByteSize = BYTE_SIZE_EIGHTBITS, PARITY_CHECK eParity = PARITY_CHECK_NONE, STOP_BITS eStopBits = STOPBITS_ONE){ return _flange_serial_open(_rbtCtrl, baudrate, eByteSize, eParity, eStopBits); };
+        bool flange_serial_open(int baudrate = 115200, BYTE_SIZE eByteSize = BYTE_SIZE_EIGHTBITS, PARITY_CHECK eParity = PARITY_CHECK_NONE, STOP_BITS eStopBits = STOPBITS_ONE){ return _flange_serial_open(_rbtCtrl, baudrate, eByteSize, eParity, eStopBits); };
         bool flange_serial_close(){ return _flange_serial_close(_rbtCtrl); };
-        bool flange_serial_write(int nSize, char* pSendData){ return _flange_serial_write(_rbtCtrl, nSize, pSendData); };
-        LPFLANGE_SER_RXD_INFO flange_serial_read(float fTimeout = -1){ return _flange_serial_read(_rbtCtrl, fTimeout); };
+        bool flange_serial_write(int nSize, char* pSendData, int nPort = 1){ return _flange_serial_write(_rbtCtrl, nSize, pSendData, nPort); };
+        LPFLANGE_SER_RXD_INFO flange_serial_read(float fTimeout = -1, int nPort = 1){ return _flange_serial_read(_rbtCtrl, fTimeout, nPort); };      
 
         ////////////////////////////////////////////////////////////////////////////
         //  Configuration Operations                                               //
@@ -752,19 +782,19 @@ namespace DRAFramework
         bool add_tool(string strSymbol, float fWeight, float fCog[3], float fInertia[NUM_TASK]) { return _add_tool(_rbtCtrl, strSymbol.c_str(), fWeight, fCog, fInertia); };
         // del tool(end-effector) informaiton
         bool del_tool(string strSymbol) { return _del_tool(_rbtCtrl, strSymbol.c_str()); };
-
+        
         // set robot tcp information
         bool set_tcp(string strSymbol) { return _set_tcp(_rbtCtrl, strSymbol.c_str()); };
         // get robot tcp information
-        string get_tcp() { return string(_get_tcp(_rbtCtrl)); };
+        string get_tcp() { return string(_get_tcp(_rbtCtrl)); };  
         // add robot tcp information
         bool add_tcp(string strSymbol, float fPostion[NUM_TASK]) { return _add_tcp(_rbtCtrl, strSymbol.c_str(), fPostion); };
         // del robot tcp information
         bool del_tcp(string strSymbol) { return _del_tcp(_rbtCtrl, strSymbol.c_str()); };
-
+        
         // set robot tool shape information
         bool set_tool_shape(string strSymbol){return _set_tool_shape(_rbtCtrl, strSymbol.c_str());};
-        // get robot tool shape information
+        // get robot tool shape information 
         string get_tool_shape(){ return _get_tool_shape(_rbtCtrl);};
         // add robot tool shape information
         bool add_tool_shape(){return true;};
@@ -777,8 +807,8 @@ namespace DRAFramework
         bool release_protective_stop(RELEASE_MODE eReleaseMode){ return _release_protective_stop(_rbtCtrl, eReleaseMode); };
 
 
-        bool add_sw_module(){ return _add_sw_module(_rbtCtrl); };
-        bool del_sw_module(){ return _del_sw_module(_rbtCtrl); };
+        unsigned char add_sw_module(){ return _add_sw_module(_rbtCtrl); };
+        unsigned char del_sw_module(){ return _del_sw_module(_rbtCtrl); };
         bool update_sw_module(const char* lpszIpAddr, const char* lpszModuleFile){ return _update_sw_module(_rbtCtrl, lpszIpAddr, lpszModuleFile); };
 
         bool set_safety_mode(SAFETY_MODE eSafetyMode, SAFETY_MODE_EVENT eSafetyEvent){ return _set_safety_mode(_rbtCtrl, eSafetyMode, eSafetyEvent); };
@@ -788,7 +818,7 @@ namespace DRAFramework
         LPSAFETY_CONFIGURATION_EX get_safety_configuration(){ return _get_safety_configuration(_rbtCtrl); };
 
         int check_motion() {return _check_motion(_rbtCtrl);};
-
+        
 
         ////////////////////////////////////////////////////////////////////////////
         //  drl program Operations                                                //
@@ -819,7 +849,7 @@ namespace DRAFramework
         bool check_position_condition_abs(FORCE_AXIS eForceAxis, float fTargetMin, float fTargetMax, COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL) { return _check_position_condition_abs(_rbtCtrl, eForceAxis, fTargetMin, fTargetMax, eForceReference); };
         bool check_position_condition_rel(FORCE_AXIS eForceAxis, float fTargetMin, float fTargetMax, float fTargetPos[NUM_TASK], COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL) { return _check_position_condition_rel(_rbtCtrl, eForceAxis, fTargetMin, fTargetMax, fTargetPos, eForceReference); };
         bool check_position_condition(FORCE_AXIS eForceAxis, float fTargetMin, float fTargetMax, float fTargetPos[NUM_TASK], MOVE_MODE eMode = MOVE_MODE_ABSOLUTE, COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL) { return _check_position_condition(_rbtCtrl, eForceAxis, fTargetMin, fTargetMax, fTargetPos, eMode, eForceReference); };
-
+        
         bool check_orientation_condition(FORCE_AXIS eForceAxis, float fTargetMin[NUM_TASK], float fTargetMax[NUM_TASK], COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL) { return _check_orientation_condition_abs(_rbtCtrl, eForceAxis, fTargetMin, fTargetMax, eForceReference); };
         bool check_orientation_condition(FORCE_AXIS eForceAxis, float fTargetMin, float fTargetMax, float fTargetPos[NUM_TASK], COORDINATE_SYSTEM eForceReference = COORDINATE_SYSTEM_TOOL) { return _check_orientation_condition_rel(_rbtCtrl, eForceAxis, fTargetMin, fTargetMax, fTargetPos, eForceReference); };
         bool is_done_bolt_tightening(FORCE_AXIS eForceAxis, float fTargetTor = 0.f, float fTimeout = 0.f) { return _is_done_bolt_tightening(_rbtCtrl, eForceAxis, fTargetTor, fTimeout); };
@@ -827,7 +857,7 @@ namespace DRAFramework
         bool align_axis(float fTargetPos1[NUM_TASK], float fTargetPos2[NUM_TASK], float fTargetPos3[NUM_TASK], float fSourceVec[3], TASK_AXIS eTaskAxis, COORDINATE_SYSTEM eSourceRef = COORDINATE_SYSTEM_BASE){return _align_axis1(_rbtCtrl, fTargetPos1, fTargetPos2, fTargetPos3, fSourceVec, eTaskAxis, eSourceRef);};
         bool parallel_axis(float fTargetVec[3], TASK_AXIS eTaskAxis, COORDINATE_SYSTEM eSourceRef){return _parallel_axis2(_rbtCtrl, fTargetVec, eTaskAxis, eSourceRef);};
         bool align_axis(float fTargetVec[3], float fSourceVec[3], TASK_AXIS eTaskAxis, COORDINATE_SYSTEM eSourceRef){return _align_axis2(_rbtCtrl, fTargetVec, fSourceVec, eTaskAxis, eSourceRef);};
-
+        
         ////////////////////////////////////////////////////////////////////////////
         //  coordinate system control                                             //
         ////////////////////////////////////////////////////////////////////////////
@@ -853,3 +883,4 @@ protected:
     };
 #endif
 }
+

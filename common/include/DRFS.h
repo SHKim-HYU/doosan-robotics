@@ -55,6 +55,9 @@ using namespace std;
 #endif
 
 #pragma pack(1)
+
+#define INFRACORE_PATCH
+
 typedef struct _SYSTEM_VERSION
 {
     /* smarttp version */
@@ -233,12 +236,116 @@ typedef struct _MONITORING_DATA
 
 } MONITORING_DATA, *LPMONITORING_DATA;
 
+typedef struct _MONITORING_FLANGE_IO_CONFIG
+{
+    float               _iActualAI[MAX_FLANGE_AI];
+    /* X1 RS485/Analog input pin mux */
+    unsigned char               _iX1Rs485FAIPinMux;
+    /* X2 RS485/Analog input pin mux */
+    unsigned char               _iX2Rs485FAIPinMux;
+    /* X1 Digital output pin BJT type */
+    unsigned char               _iX1DOBjtType;
+    /* X2 Digital output pin BJT type */
+    unsigned char               _iX2DOBjtType;
+    /* Voltage output level */
+    unsigned char               _iVoutLevel;
+    /* X1 Analog input 0 current or voltage mode */
+    unsigned char               _iFAI0Mode;
+    /* X1 Analog input 1 current or voltage mode */
+    unsigned char               _iFAI1Mode;
+    /* X2 Analog input 2 current or voltage mode */
+    unsigned char               _iFAI2Mode;
+    /* X2 Analog input 3 current or voltage mode */
+    unsigned char               _iFAI3Mode;
+    /* Serial X1 Baudrate */
+    unsigned char               _szX1Baudrate[7]; // "0115200"(ASCII)
+    /* Serial X1 Data Length */
+    unsigned char               _szX1DataLength;  // 0: 1bit, 7: 8bit
+    /* Serial X1 Parity */
+    unsigned char               _szX1Parity;      // 0x00 : Non-parity, 0x01 : Odd, 0x02 : Even
+    /* Serial X1 Stop Bit */
+    unsigned char               _szX1StopBit;     // 0x01 : One stop bit, 0x02 : Two Stop bit
+    /* Serial X2 Baudrate */
+    unsigned char               _szX2Baudrate[7]; // "0115200"(ASCII)
+    /* Serial X2 Data Length */
+    unsigned char               _szX2DataLength;  // 0: 1bit, 7: 8bit
+    /* Serial X2 Parity */
+    unsigned char               _szX2Parity;      // 0x00 : Non-parity, 0x01 : Odd, 0x02 : Even
+    /* Serial X2 Stop Bit */
+    unsigned char               _szX2StopBit;     // 0x01 : One stop bit, 0x02 : Two Stop bit
+    /* Servo Safety Mode */
+    unsigned char               _iServoSafetyMode;     // 0x01 : One stop bit, 0x02 : Two Stop bit
+    /* Interrupt Safety Mode */
+    unsigned char               _iInterruptSafetyMode;     // 0x01 : One stop bit, 0x02 : Two Stop bit
+} MONITORING_FLANGE_IO_CONFIG, *LPMONITORING_FLANGE_IO_CONFIG;
+
+typedef struct _ROBOT_MONITORING_SENSOR
+{
+    /* Force Torque Sensor Value */
+    float                       _fActualFTS[NUMBER_OF_JOINT];
+    /* current sensor */
+    float                       _fActualCS[NUMBER_OF_JOINT];
+    /* accelerate speed sensro */
+    float                       _fActualACS[3];
+
+} ROBOT_MONITORING_SENSOR, *LPROBOT_MONITORING_SENSOR;
+
+typedef struct _ROBOT_MONITORING_AMODEL
+{
+    /* sensor */
+    ROBOT_MONITORING_SENSOR     _tSensor;
+    /* singularity */
+    float                       _fSingularity;
+} ROBOT_MONITORING_AMODEL, *LPROBOT_MONITORING_AMODEL;
+
+typedef ROBOT_MONITORING_AMODEL
+    MONITORING_AMODEL, *LPMONITORING_AMODEL;
+
+typedef struct _MONITORING_FORCECONTROL
+{
+/* digital button state */
+    unsigned char               _iActualBS[NUMBER_OF_BUTTON];
+    /* current sensor */
+    float                       _fActualCS[NUMBER_OF_JOINT];
+    /* singularity */
+    float                       _fSingularity;
+    /* Tool Coord External Task Force/Torque */
+    float                       _fToolActualETT[NUMBER_OF_JOINT];
+    /* ForceControlMode */
+    unsigned char               _iForceControlMode[NUMBER_OF_JOINT]; // 0:Compliance, 1:Force Control, 2:None
+    /* reference coordinate */
+    unsigned char               _iReferenceCoord;  // 0:Base, 1:Tool, 2:World, 101~120:User Coord
+} MONITORING_FORCECONTROL, *LPMONITORING_FORCECONTROL;
+
 typedef struct _MONITORING_DATA_EX
 {
     MONITORING_CONTROL_EX       _tCtrl;
     /* misc. */
     MONITORING_MISC             _tMisc;
 
+    union {
+#if 0
+        MONITORING_COCKPIT          _tCockpit;
+#else
+        MONITORING_FORCECONTROL       _tCtrlEx;
+#endif
+
+        unsigned char               _szReserved1[120];
+    }                               _tMiscEx;
+
+    union {
+        MONITORING_AMODEL       _tAModel;
+        unsigned char           _szReserved[64];
+    }                           _tModel;
+
+    union {
+        MONITORING_FLANGE_IO_CONFIG _tConfig;
+        unsigned char           _szReserved[56];
+    }                           _tFlangeIo;
+
+//#else
+//    unsigned char               _szReserved2[120];
+//#endif
 } MONITORING_DATA_EX, *LPMONITORING_DATA_EX;
 
 typedef struct _READ_CTRLIO_INPUT
@@ -527,7 +634,8 @@ typedef struct _FLANGE_SER_RXD_INFO
     short                               _iSize;      //max 256bytes
     /* raw serial data */
     unsigned char                       _cRxd[256];
-
+    /* target port # */
+    unsigned char                       _portNum;
 } FLANGE_SER_RXD_INFO, *LPFLANGE_SER_RXD_INFO;
 
 typedef struct _READ_FLANGE_SERIAL
@@ -535,6 +643,12 @@ typedef struct _READ_FLANGE_SERIAL
     // check ready to read
     unsigned char               _bRecvFlag;    // 0: non-receive, 1: received
 } READ_FLANGE_SERIAL, *LPREAD_FLANGE_SERIAL;
+
+typedef struct _READ_FLANGE_SERIAL_EX
+{
+    // check ready to read
+    unsigned char               _bRecvFlag[2];    // 0: non-receive, 1: received
+} READ_FLANGE_SERIAL_EX, *LPREAD_FLANGE_SERIAL_EX;
 
 typedef struct _INVERSE_KINEMATIC_RESPONSE
 {
@@ -1117,6 +1231,308 @@ typedef struct _CONFIG_TOOL_SHAPE_LIST
     CONFIG_TOOL_SHAPE_SYMBOL    _tTooList[MAX_CONFIG_TOOL_SIZE];
 } CONFIG_TOOL_SHAPE_LIST, *LPCONFIG_TOOL_SHAPE_LIST;
 
+typedef struct _SAFETY_ZONE_SHAPE_SPHERE
+{   
+    /* center */
+    POINT_3D                _tCenter;
+    /* radius */
+    float                   _fRadius;
+} SAFETY_ZONE_SHAPE_SPHERE, *LPSAFETY_ZONE_SHAPE_SPHERE;
+
+typedef struct _SAFETY_ZONE_SHAPE_CYLINDER
+{
+    /* center */
+    POINT_2D                _tCenter;
+    /* radius */
+    float                   _fRadius;    
+    float                   _fZLoLimit;
+    float                   _fZUpLimit;
+
+} SAFETY_ZONE_SHAPE_CYLINDER, *LPSAFETY_ZONE_SHAPE_CYLINDER;
+
+typedef struct _SAFETY_ZONE_SHAPE_CUBOID
+{
+    float                   _fXLoLimit;
+    float                   _fYLoLimit;
+    float                   _fZLoLimit;
+    float                   _fXUpLimit;
+    float                   _fYUpLimit;
+    float                   _fZUpLimit;
+
+} SAFETY_ZONE_SHAPE_CUBOID, *LPSAFETY_ZONE_SHAPE_CUBOID;
+
+typedef struct _SAFETY_ZONE_SHAPE_TILTED_CUBOID
+{
+    POINT_3D                _tOrigin;
+    POINT_3D                _tUAxisEnd;
+    POINT_3D                _tVAxisEnd;
+    POINT_3D                _tWAxisEnd;
+} SAFETY_ZONE_SHAPE_TILTED_CUBOID, *LPSAFETY_ZONE_SHAPE_TILTED_CUBOID;
+
+typedef LINE LINE_2D;
+
+typedef struct _SAFETY_ZONE_SHAPE_MULTI_PLANE
+{
+    unsigned char           _iValidPlane[6];    
+    LINE_2D                 _tPlane[6];
+    float                   _fZLoLimit;
+    float                   _fZUpLimit;
+    POINT_2D                _tSpacePoint;
+} SAFETY_ZONE_SHAPE_MULTI_PLANE, *LPSAFETY_ZONE_SHAPE_MULTI_PLANE;
+
+typedef struct _SAFETY_ZONE_SHAPE_CAPSULE
+{
+    POINT_3D                _tCenter1;
+    POINT_3D                _tCenter2;
+    /* radius */
+    float                   _fRadius;
+} SAFETY_ZONE_SHAPE_CAPSULE, *LPSAFETY_ZONE_SHAPE_CAPSULE;
+
+typedef union _SAFETY_ZONE_SHAPE_DATA
+{
+    SAFETY_ZONE_SHAPE_SPHERE            _tSphere;
+    SAFETY_ZONE_SHAPE_CYLINDER          _tCylinder;
+    SAFETY_ZONE_SHAPE_CUBOID            _tCuboid;
+    SAFETY_ZONE_SHAPE_TILTED_CUBOID     _tOBB;
+    SAFETY_ZONE_SHAPE_MULTI_PLANE       _tMultiPlane;
+    SAFETY_ZONE_SHAPE_CAPSULE           _tCapsule;
+    unsigned char                       _iBuffer[120];
+} SAFETY_ZONE_SHAPE_DATA, *LPSAFETY_ZONE_SHAPE_DATA;
+
+typedef struct _SAFETY_ZONE_SHAPE
+{
+    /* coordinated: 0(base), 2(world) */
+    unsigned char               _iCoordinate;
+    /* geometry object type :  0(Sphere), 1(Cylinder), 2(Cuboid), 3(Tilted Cuboid), 4(Multi-Plane), 5(Capsule) */
+    unsigned char               _iShapeType;
+    /* geometry object  data */
+    SAFETY_ZONE_SHAPE_DATA      _tShapeData;
+    /* Positive value: expand shape, Negative value: shrink value */
+    float                       _fMargin;
+    /* Valid space: 0(inside), 1(outside) */
+    unsigned char               _iValidSpace;
+    /* Reserved for future use */
+    unsigned char               _iReserved[13];
+} SAFETY_ZONE_SHAPE, *LPSAFETY_ZONE_SHAPE;
+
+typedef struct _LOCAL_ZONE_PROPERTY_JOINT_RANGE
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride[6];
+    /* 0(No Override): 1(Override global property) */
+    /*unsigned char               _iOverrideReduce[6];*/
+    /* Override Value */
+    float                       _fMinRange[6];
+    float                       _fMaxRange[6];
+} LOCAL_ZONE_PROPERTY_JOINT_RANGE, *LPLOCAL_ZONE_PROPERTY_JOINT_RANGE;
+
+typedef struct _LOCAL_ZONE_PROPERTY_JOINT_SPEED
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride[6];
+    /* 0(No Override): 1(Override global property) */
+    /*unsigned char               _iOverrideReduce[6];*/
+    /* Override Value */
+    float                       _fSpeed[6];
+} LOCAL_ZONE_PROPERTY_JOINT_SPEED, *LPLOCAL_ZONE_PROPERTY_JOINT_SPEED;
+
+typedef struct _LOCAL_ZONE_PROPERTY_TCP_FORCE
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;
+    /* 0(No Override): 1(Override global property) */
+    /*unsigned char               _iOverrideReduce;*/
+    /* Override Value */
+    float                       _fForce;
+} LOCAL_ZONE_PROPERTY_TCP_FORCE, *LPLOCAL_ZONE_PROPERTY_TCP_FORCE;
+
+typedef struct _LOCAL_ZONE_PROPERTY_TCP_POWER
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;
+    /* 0(No Override): 1(Override global property) */
+    /*unsigned char               _iOverrideReduce;*/
+    /* Override Value */
+    float                       _fPower;
+} LOCAL_ZONE_PROPERTY_TCP_POWER, *LPLOCAL_ZONE_PROPERTY_TCP_POWER;
+
+typedef struct _LOCAL_ZONE_PROPERTY_TCP_SPEED
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;
+    /* 0(No Override): 1(Override global property) */
+    /*unsigned char               _iOverrideReduce;*/
+    /* Override Value */
+    float                       _fSpeed;
+} LOCAL_ZONE_PROPERTY_TCP_SPEED, *LPLOCAL_ZONE_PROPERTY_TCP_SPEED;
+
+typedef struct _LOCAL_ZONE_PROPERTY_TCP_MOMENTUM
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;
+    /* 0(No Override): 1(Override global property) */
+    /*unsigned char               _iOverrideReduce;*/
+    /* Override Value */
+    float                       _fMomentum;
+} LOCAL_ZONE_PROPERTY_TCP_MOMENTUM, *LPLOCAL_ZONE_PROPERTY_TCP_MOMENTUM;
+
+typedef struct _LOCAL_ZONE_PROPERTY_COLLISION
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;
+    /* 0(No Inspection): 1(Inspect, Apply local sensitivity) */
+    /*unsigned char               _iCollisionInspection;*/
+    /* Override Value */
+    float                       _fSensitivity;
+} LOCAL_ZONE_PROPERTY_COLLISION, *LPLOCAL_ZONE_PROPERTY_COLLISION;
+
+typedef struct _LOCAL_ZONE_PROPERTY_SPEED_RATE
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;
+    /* Override Value */
+    float                       _fSpeedRate;
+} LOCAL_ZONE_PROPERTY_SPEED_RATE, *LPLOCAL_ZONE_PROPERTY_SPEED_RATE;
+
+typedef struct _LOCAL_ZONE_PROPERTY_SPEED_REDUCTION
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;    
+    /* Override Value */
+    float                       _fReductionRate;
+} LOCAL_ZONE_PROPERTY_SPEED_REDUCTION, *LPLOCAL_ZONE_PROPERTY_SPEED_REDUCTION;
+
+typedef struct _LOCAL_ZONE_PROPERTY_COLLISION_STOPMODE
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;    
+    /* Override Value: 0(STO), 2(SS1), 3(SS2), 4(RS1) */
+    unsigned char               _iStopMode;
+} LOCAL_ZONE_PROPERTY_COLLISION_STOPMODE, *LPLOCAL_ZONE_PROPERTY_COLLISION_STOPMODE;
+
+typedef struct _LOCAL_ZONE_PROPERTY_TCPSLF_STOPMODE
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;    
+    /* Override Value: 0(STO), 2(SS1), 3(SS2), 4(RS1) */
+    unsigned char               _iStopMode;
+} LOCAL_ZONE_PROPERTY_TCPSLF_STOPMODE, *LPLOCAL_ZONE_PROPERTY_TCPSLF_STOPMODE;
+
+typedef struct _LOCAL_ZONE_PROPERTY_TOOL_ORIENTATION
+{
+    /* 0(No Override): 1(Override global property) */
+    unsigned char               _iOverride;    
+    /* Override Value */
+    float                       _fDirection[3];
+    float                       _fAngle;
+} LOCAL_ZONE_PROPERTY_TOOL_ORIENTATION, *LPLOCAL_ZONE_PROPERTY_TOOL_ORIENTATION;
+
+typedef struct _SAFETY_ZONE_PROPERTY_SPACE_LIMIT
+{
+    /* Inspection Type: 0(body), 1(tcp) */
+    unsigned char               _iInspectionType;
+    /* Valid Space: 0(inside), 1(outside) */
+    /*unsigned char               _iValidSpace;*/
+    /* Override Joint Range */
+    LOCAL_ZONE_PROPERTY_JOINT_RANGE _tJointRangeOverride;
+    /* Dynamic Zone Enable Option: 0(Not used), 1~8(safety input channel) */
+    unsigned char               _iDynamicZoneEnable;	
+#if defined(PACKET_GF020600)
+    /* Inside Zone Dectection Option: 0(Not used), 1~8(safety input channel) */
+    unsigned char               _iInsideZoneDectection;
+#endif
+} SAFETY_ZONE_PROPERTY_SPACE_LIMIT, *LPSAFETY_ZONE_PROPERTY_SPACE_LIMIT;
+
+typedef struct _SAFETY_ZONE_PROPERTY_LOCAL_ZONE
+{    
+    /* Override Joint Range */
+    LOCAL_ZONE_PROPERTY_JOINT_RANGE _tJointRangeOverride;
+    /* Override Joint Speed */
+    LOCAL_ZONE_PROPERTY_JOINT_SPEED _tJointSpeedOverride;
+    /* Override Tcp Force */
+    LOCAL_ZONE_PROPERTY_TCP_FORCE _tTcpForceOverride;
+    /* Override Tcp Power */
+    LOCAL_ZONE_PROPERTY_TCP_POWER _tTcpPowerOverride;
+    /* Override Tcp Speed */
+    LOCAL_ZONE_PROPERTY_TCP_SPEED _tTcpSpeedOverride;
+    /* Override Tcp Momentum */
+    LOCAL_ZONE_PROPERTY_TCP_MOMENTUM _tTcpMomentumOverride;
+    /* Override Collision */
+    LOCAL_ZONE_PROPERTY_COLLISION _tCollisionOverride;
+    /* Override Speed Rate */
+    LOCAL_ZONE_PROPERTY_SPEED_RATE _tSpeedRate;
+    /* Override Collision Stop mode */
+    LOCAL_ZONE_PROPERTY_COLLISION_STOPMODE _tCollisionViolationStopmodeOverride;
+    /* Override Tcp-SLF Stop mode */
+    LOCAL_ZONE_PROPERTY_TCPSLF_STOPMODE _tForceViolationStopmodeOverride;
+    /* Override Tool Orientation Limit */
+    LOCAL_ZONE_PROPERTY_TOOL_ORIENTATION _tToolOrientationLimitOverride;
+    /* Dynamic Zone Enable Option: 0(Not used), 1~8(safety input channel) */
+    unsigned char               _iDynamicZoneEnable;
+    /* Led: 0(Not used), 1(Green), 2(Yellow) */
+    unsigned char               _iLedOverride;
+    /* Nudge Enable: 0(Disable), 1(Enable) */
+    unsigned char               _iNundgeEanble;
+    /* Allow less safe work: 0(not allowed), 1(allowed) */
+    unsigned char               _iAllowLessSafeWork;
+	/* 0(No Override: Consider Reduce Mode): 1(Override: Ignore Reduce Mode) */
+    unsigned char               _iOverrideReduce;
+#if defined(PACKET_GF020600)
+    /* Inside Zone Dectection Option: 0(Not used), 1~8(safety input channel) */
+    unsigned char               _iInsideZoneDectection;
+    /* collaborative zone option: 0(Not used), 1(Used) */
+    unsigned char               _bCollaborativeZone;
+#endif
+
+	/* _tReservedBuffer[0] as 'is collaborativew workspace' */
+	/* _tReservedBuffer[1] as 'is collision mute zone' */
+	/* _tReservedBuffer[2] as 'is tool orientation limit zone' */
+	/* _tReservedBuffer[3] as 'is clamping prevention zone'  */
+	unsigned char				_tReservedBuffer[58];
+
+} SAFETY_ZONE_PROPERTY_LOCAL_ZONE, *LPSAFETY_ZONE_PROPERTY_LOCAL_ZONE;
+
+typedef union _SAFETY_ZONE_PROPERTY_DATA
+{
+    SAFETY_ZONE_PROPERTY_SPACE_LIMIT    _tSpaceLimitZone;
+    SAFETY_ZONE_PROPERTY_LOCAL_ZONE     _tLocalZone;    
+    unsigned char                       _iBuffer[200];
+} SAFETY_ZONE_PROPERTY_DATA, *LPSAFETY_ZONE_PROPERTY_DATA;
+
+typedef struct _CONFIG_ADD_SAFETY_ZONE
+{
+    /* Zone Identifier: uuid */
+    char                            _szIdentifier[32];
+    /* Zone alias : nullable */
+    char                            _szAlias[32];
+    /* Zone type: 0(space limit), 1(local zone) */
+    unsigned char                   _iZoneType;
+    /* Zone property */
+    SAFETY_ZONE_PROPERTY_DATA       _tZoneProperty;
+    /* Zone shape */
+    SAFETY_ZONE_SHAPE               _tShape;
+} CONFIG_ADD_SAFETY_ZONE, *LPCONFIG_ADD_SAFETY_ZONE;
+
+typedef CONFIG_ADD_SAFETY_ZONE CONFIG_SAFETY_ZONE;
+
+typedef struct _CONFIG_USER_COORDINATE
+{
+    float _fTargetPos[NUM_TASK];
+    unsigned char _iReqId;
+} CONFIG_USER_COORDINATE, *LPCONFIG_USER_COORDINATE;
+
+
+typedef struct _CONFIG_USER_COORDINATE_EX
+{
+    /* base: 0, world: 2 */
+    unsigned char               _iTargetRef;
+    /* task position*/
+    float                       _fTargetPos[NUMBER_OF_JOINT];
+    /* unified id */
+    unsigned char               _iUserID;
+
+} CONFIG_USER_COORDINATE_EX, *LPCONFIG_USER_COORDINATE_EX;
+
 typedef struct _SAFETY_CONFIGURATION_EX
 {
     unsigned int _iDataVersion;
@@ -1154,17 +1570,33 @@ typedef struct _SAFETY_CONFIGURATION_EX
     float m_CwsSpeedRatio;
     float m_IoSpeedRatio;
 
-#ifdef _UNIFY_SAFETY_ZONE
     int _iSafetyZoneCount;
     CONFIG_SAFETY_ZONE _tSafetyZone[20];
-#endif
 
-#ifdef _FUNC_USER_COORDINATE
+
     int _iUserCoordCount;
-    CONFIG_USER_COORDINATE _tUserCoordinates[20];
-#endif
+    CONFIG_USER_COORDINATE_EX _tUserCoordinates[20];
+
     CONFIG_CONFIGURABLE_IO _tConfigurableIO;
 
 } SAFETY_CONFIGURATION_EX, *LPSAFETY_CONFIGURATION_EX;
 
+typedef struct _CONFIG_PAYLOAD_EX
+{
+    /* mass(kg) */
+    float                       _fWeight;
+    /* center of mass */
+    float                       _fXYZ[3];
+
+    /* COG Reference */
+    unsigned short              _iCogReference;
+    /* Add Up*/
+    unsigned short              _iAddUp;
+
+    float                       _fStartTime;
+
+    float                       _fTransitionTime;
+
+    unsigned char               _iReserved[32];
+} CONFIG_PAYLOAD_EX, *LPCONFIG_PAYLOAD_EX;
 #pragma pack()

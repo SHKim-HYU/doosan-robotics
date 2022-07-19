@@ -3,7 +3,15 @@
 # ##
 # @brief    [py example simple] motion basic test for doosan robot
 # @author   Kab Kyoum Kim (kabkyoum.kim@doosan.com)   
-# TEST 2019-12-09
+
+#1 mtplnr@mtplnr:~$ roslaunch dsr_control dsr_rt_control.launch host:=192.168.12.21 mode:=real
+#mtplnr@mtplnr:~$ roslaunch dsr_control dsr_rt_control.launch mode:=real host:=192.168.12.21
+
+# imple$ rosrun dsr_example_py dsr_simple_test.py 
+
+
+
+
 import rospy
 import os
 import threading, time
@@ -14,7 +22,6 @@ sys.dont_write_bytecode = True
 # for single robot 
 ROBOT_ID     = "dsr01"
 ROBOT_MODEL  = "m0609"
-
 from DSR_ROBOT import *
 __dsr__id = ROBOT_ID
 __dsr__model = ROBOT_MODEL
@@ -104,16 +111,14 @@ def thread_subscriber():
     #rospy.spinner(2)    
   
 if __name__ == "__main__":
-    rospy.init_node('single_robot_simple_py')
+    rospy.init_node('dsr_simple_test_py')
     rospy.on_shutdown(shutdown)
-    set_robot_mode  = rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/system/set_robot_mode', SetRobotMode)
+
     t1 = threading.Thread(target=thread_subscriber)
     t1.daemon = True 
     t1.start()
 
     pub_stop = rospy.Publisher('/'+ROBOT_ID +ROBOT_MODEL+'/stop', RobotStop, queue_size=10)           
-
-    set_robot_mode(ROBOT_MODE_AUTONOMOUS)
 
     set_velx(30,20)  # set global task speed: 30(mm/sec), 20(deg/sec)
     set_accx(60,40)  # set global task accel: 60(mm/sec2), 40(deg/sec2)
@@ -122,7 +127,7 @@ if __name__ == "__main__":
     accx=[100, 100]
 
     p1= posj(0,0,0,0,0,0)                    #joint
-    p2= posj(0.0, 45.0, 90.0, 0.0, -45.0, 0.0) #joint
+    p2= posj(0.0, 0.0, 90.0, 0.0, 90.0, 0.0) #joint
 
     x1= posx(400, 500, 800.0, 0.0, 180.0, 0.0) #task
     x2= posx(400, 500, 500.0, 0.0, 180.0, 0.0) #task
@@ -167,15 +172,14 @@ if __name__ == "__main__":
     b_list1 = [seg11, seg12, seg14, seg15, seg16] 
 
     while not rospy.is_shutdown():
-        movej(p2, vel=100, acc=100, time=5)
-       # movejx(x1, vel=30, acc=60, sol=0)
-        #movel(x2, velx, accx)
-        #movej(p1, vel=100, acc=100)
-       # movec(c1, c2, velx, accx)
-       # movesj(qlist, vel=100, acc=100, time=10)
-       # movesx(xlist, vel=100, acc=100)
-       # move_spiral(rev=9.5,rmax=20.0,lmax=50.0,time=20.0,axis=DR_AXIS_Z,ref=DR_TOOL)
-       # move_periodic(amp =[10,0,0,0,30,0], period=1.0, atime=0.2, repeat=5, ref=DR_TOOL)
-       # moveb(b_list1, vel=150, acc=250, ref=DR_BASE, mod=DR_MV_MOD_ABS)
+        movej(p2, vel=100, acc=100)
+        #movejx(x1, vel=30, acc=60, sol=0)
+        #movel(x2, velx, accx) 
+        #movec(c1, c2, velx, accx)
+        #movesj(qlist, vel=100, acc=100)
+        #movesx(xlist, vel=100, acc=100)
+        #move_spiral(rev=9.5,rmax=20.0,lmax=50.0,time=20.0,axis=DR_AXIS_Z,ref=DR_BASE) # robot error peak?
+        move_periodic(amp =[100,100,0,0,0,0], period=[3.2,1.6,0,0,0,0], atime=3.1, repeat=2, ref=DR_BASE) # robot error peak?
+        #moveb(b_list1, vel=150, acc=250, ref=DR_BASE, mod=DR_MV_MOD_ABS)
 
     print('good bye!')

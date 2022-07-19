@@ -20,9 +20,6 @@
     =                                    fix SWRPT-4697(Resolving version compatibility issues)
     =                     1.14 (GL010108) fix TOnDisconnectedCB(reconnection) =
     =                                    fix movesj, amovesj                  =
-    =                     1.15 (GL010109) add flange_serial_read (add timeout param)
-    =                                    fix set_user_home / move_home        =
-    =                                    fix flaneg_serial_open(baudrate param)
     ======================================================================== */
 
 /*********************************************************************
@@ -292,6 +289,8 @@ namespace DRAFramework
 
         void PrintFParam(float* printArr, int iSize, string strFunc);
         void PrintUCParam(unsigned char* printArr, int iSize, string strFunc);
+        bool CheckNewFlange();
+
 #ifdef __cplusplus
     };
 #endif
