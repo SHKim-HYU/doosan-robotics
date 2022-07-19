@@ -32,7 +32,11 @@
      <xacro:include filename="$(find dsr_description)/xacro/robotiq_2f.urdf.xacro" />
      
   </xacro:if>
-
+  
+  <xacro:if value="${gr == 'charger'}">
+     <xacro:include filename="$(find dsr_description)/xacro/charger.urdf.xacro" />
+  </xacro:if>
+  
   <!-- World fixed joint-->
   <joint name="world_fixed" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0"/>
