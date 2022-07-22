@@ -4,18 +4,21 @@ import numpy as np
 from std_msgs.msg import Float32MultiArray
 from sensor_msgs.msg import JointState
 from copy import copy
-from math import sin, cos, tan
+from math import sin, cos, tan, pi
 from dsr_msgs.msg import ServoJStream, ServoJRTStream, SpeedJRTStream, SpeedJRTStream, RobotStateRT, TorqueRTStream
 from trajectory_generate import Trajectory
 from time import time
 import modern_robotics as mr
 import pandas as pd
+import os
 
 ROBOT_ID     = "dsr01"
 ROBOT_MODEL  = "m0609"
 from DSR_ROBOT import *
 __dsr__id = ROBOT_ID
 __dsr__model = ROBOT_MODEL
+
+Joint_number = "2"
 
 
 ### Sellect the controller options: position and velocity controller are not implemented yet (those make some purterbation during the execution)
@@ -100,25 +103,33 @@ while not rospy.is_shutdown():
     # eta = np.linalg.pinv(np.transpose(J_b))@H_-Gamma@Jb_dot@np.linalg.pinv(J_b)@
 
 
+    if motion==0 and traj_flag[0]==0:
+        if Joint_number == "1":
+            qd[0] = trj_q[0] + 0.2*sin(2*pi*0.1*(g_time-init_time))
+            qd_dot[0] = 0.4*pi*0.1*cos(2*pi*0.1*(g_time-init_time))
+        elif Joint_number == "2":
+            qd[1] = trj_q[1] + 0.2*sin(2*pi*0.1*(g_time-init_time))
+            qd_dot[1] = 0.4*pi*0.1*cos(2*pi*0.1*(g_time-init_time))
+        elif Joint_number == "3":
+            qd[2] = trj_q[2] + 0.2*sin(2*pi*0.1*(g_time-init_time))
+            qd_dot[2] = 0.4*pi*0.1*cos(2*pi*0.1*(g_time-init_time))
+        elif Joint_number == "4":
+            qd[3] = trj_q[3] + 0.2*sin(2*pi*0.1*(g_time-init_time))
+            qd_dot[3] = 0.4*pi*0.1*cos(2*pi*0.1*(g_time-init_time))
+        elif Joint_number == "5":
+            qd[4] = trj_q[4] + 0.2*sin(2*pi*0.1*(g_time-init_time))
+            qd_dot[4] = 0.4*pi*0.1*cos(2*pi*0.1*(g_time-init_time))
+        elif Joint_number == "6":
+            qd[5] = trj_q[5] + 0.2*sin(2*pi*0.1*(g_time-init_time))
+            qd_dot[5] = 0.4*pi*0.1*cos(2*pi*0.1*(g_time-init_time))
+
     if motion==1 and traj_flag[0]==0:
         # trj_q=[1.5709,0.7,1.5709,0,-0.7,0]
-        trj_q=[0.78539,0.523598,1.74532,0,-0.69813,0]
-        motion+=1
+        trj_q=[0,0,0,0,0,0]
+        motion=0
         # motion=0
         traj_flag=[1]*6
-    elif motion==2 and traj_flag[0]==0:
-        trj_q=[0,0,0,0,0,0]
-        # motion+=1
-        motion=1
-        traj_flag=[1]*6
-    elif motion==3 and traj_flag[0]==0:
-        trj_q=[-1.5709,-0.7,0,0,0,0]
-        motion+=1
-        traj_flag=[1]*6
-    elif motion==4 and traj_flag[0]==0:
-        trj_q=[0.0,0.0,0,0,0,0]
-        motion=1
-        traj_flag=[1]*6
+
 
     for i in range(6):
         if traj_flag[i]==1:
@@ -136,57 +147,52 @@ while not rospy.is_shutdown():
             if tmp_flag == 0:
                 traj_flag[i]=0
 
-    Kp=np.array([2400,1300,1300,900,800,800])
-    Kd=np.array([12,6,6,2,2,2])
 
     fc = [11, 9, 5, 4, 4, 3.3]
     fb = [74, 66.24, 25.33, 10.78, 11.866, 10.197]
-
-    # Kp=np.array([1000,700,700,450,400,400])
-    # Kd=np.array([6,5,5,3,3,2])
-    # print(qd_ddot)
-    print("qd:",qd)
-    print("q:",q)
-    q_error = np.array(qd)-np.array(q)
-
-    qdot_error = np.array(qd_dot)-np.array(q_dot)
-    # print(qdot_error)
-    # qint_error = qint_error+q_error*(1/rate)
-    # print(qint_error)
-    # cmd_tor.tor = M_@(np.array(qd_ddot)+Kp@q_error+Ki@(qint_error)+Kd@qdot_error)+H_
-    print(np.array(qd_ddot)+Kp@q_error+Kd@qdot_error)
-    # cmd_tor.tor = M_@(np.array(qd_ddot)+Kp@q_error+Kd@qdot_error)+H_+tor_ext
-    print(cmd_tor)
-    # print(H_)
-    # print(M_)
-    # """
+    
     for i in range(6):
         if i == 0:
             # cmd_tor.tor[i] = 350*(qd[i]-q[i])+3*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
+            # cmd_tor.tor[i] = 350*(qd[i]-q[i])+3*(qd_dot[i]-q_dot[i])+tor_g[i]
             cmd_tor.tor[i] = 350*(qd[i]-q[i])+3*(qd_dot[i]-q_dot[i])+tor_g[i]+(fc[i]*np.sign(qd_dot[i])+fb[i]*qd_dot[i])
         elif i == 1:
             # cmd_tor.tor[i] = 400*(qd[i]-q[i])+3.2*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
+            # cmd_tor.tor[i] = 400*(qd[i]-q[i])+3.2*(qd_dot[i]-q_dot[i])+tor_g[i]
             cmd_tor.tor[i] = 400*(qd[i]-q[i])+3.2*(qd_dot[i]-q_dot[i])+tor_g[i]+(fc[i]*np.sign(qd_dot[i])+fb[i]*qd_dot[i])
         elif i == 2:
             # cmd_tor.tor[i] = 400*(qd[i]-q[i])+3.2*(qd_dot[i]-q_dot[i])+tor_g[i]+3.5*tor_ext[i]
+            # cmd_tor.tor[i] = 400*(qd[i]-q[i])+3.2*(qd_dot[i]-q_dot[i])+tor_g[i]
             cmd_tor.tor[i] = 400*(qd[i]-q[i])+3.2*(qd_dot[i]-q_dot[i])+tor_g[i]+(fc[i]*np.sign(qd_dot[i])+fb[i]*qd_dot[i])
         elif i == 3:
             # cmd_tor.tor[i] = 200*(qd[i]-q[i])+1.9*(qd_dot[i]-q_dot[i])+tor_g[i]+4*tor_ext[i]
+            # cmd_tor.tor[i] = 200*(qd[i]-q[i])+1.9*(qd_dot[i]-q_dot[i])+tor_g[i]
             cmd_tor.tor[i] = 200*(qd[i]-q[i])+1.9*(qd_dot[i]-q_dot[i])+tor_g[i]+(fc[i]*np.sign(qd_dot[i])+fb[i]*qd_dot[i])
         elif i == 4:
             # cmd_tor.tor[i] = 200*(qd[i]-q[i])+1.9*(qd_dot[i]-q_dot[i])+tor_g[i]+5*tor_ext[i]
+            # cmd_tor.tor[i] = 200*(qd[i]-q[i])+1.9*(qd_dot[i]-q_dot[i])+tor_g[i]
             cmd_tor.tor[i] = 200*(qd[i]-q[i])+1.9*(qd_dot[i]-q_dot[i])+tor_g[i]+(fc[i]*np.sign(qd_dot[i])+fb[i]*qd_dot[i])
         elif i == 5:
             # cmd_tor.tor[i] = 150*(qd[i]-q[i])+1.5*(qd_dot[i]-q_dot[i])+tor_g[i]+6*tor_ext[i]
+            # cmd_tor.tor[i] = 150*(qd[i]-q[i])+1.5*(qd_dot[i]-q_dot[i])+tor_g[i]
             cmd_tor.tor[i] = 150*(qd[i]-q[i])+1.5*(qd_dot[i]-q_dot[i])+tor_g[i]+(fc[i]*np.sign(qd_dot[i])+fb[i]*qd_dot[i])
     # """
     command.publish(cmd_tor)
-    #print(M_)
-    #print(M_@q_dot)
-    #print(C_)
-    #print(G_)
-    #print(np.linalg.pinv(J_b))
-    # print(np.linalg.pinv(np.transpose(J_b))@tor_ext)
-	#print(cmd_tor.tor)
+
+    jnt_trq = {'JT1':[cmd_tor.tor[0]-tor_g[0]],'JT2':[cmd_tor.tor[1]-tor_g[1]],'JT3':[cmd_tor.tor[2]-tor_g[2]],'JT4':[cmd_tor.tor[3]-tor_g[3]]\
+    ,'JT5':[cmd_tor.tor[4]-tor_g[3]],'JT6':[cmd_tor.tor[5]-tor_g[4]]}
+    df_jt = pd.DataFrame(jnt_trq)
+    jnt_vel = {'JV1':[q_dot[0]],'JV2':[q_dot[1]],'JV3':[q_dot[2]],'JV4':[q_dot[3]],'JV5':[q_dot[4]],'JV6':[q_dot[5]]}
+    df_jv = pd.DataFrame(jnt_vel)
+
+    if not os.path.exists(Joint_number+'_jt.csv'):
+        df_jt.to_csv(Joint_number+'_jt.csv', index=False, mode='w', encoding='utf-8-sig')
+    else:
+        df_jt.to_csv(Joint_number+'_jt.csv', index=False, mode='a', encoding='utf-8-sig', header=False)
+
+    if not os.path.exists(Joint_number+'_jv.csv'):
+        df_jv.to_csv(Joint_number+'_jv.csv', index=False, mode='w', encoding='utf-8-sig')
+    else:
+        df_jv.to_csv(Joint_number+'_jv.csv', index=False, mode='a', encoding='utf-8-sig', header=False)
     # 10Hz
     governor.sleep()

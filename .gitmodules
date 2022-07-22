@@ -1,0 +1,3 @@
+[submodule "dsr_example/py/scripts/force/ModernRobotics"]
+	path = dsr_example/py/scripts/force/ModernRobotics
+	url = https://github.com/NxRLab/ModernRobotics
