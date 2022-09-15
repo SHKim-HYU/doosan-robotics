@@ -17,7 +17,7 @@ __dsr__model = ROBOT_MODEL
 
 
 ### Sellect the controller options: position and velocity controller are not implemented yet (those make some purterbation during the execution)
-control_type = "torque" #"gravity" #"velocity" #"position" #
+control_type = "gravity" #"gravity" #"velocity" #"position" #
 
 traj = Trajectory(6)
 traj_flag = [0]*6
@@ -90,33 +90,33 @@ while not rospy.is_shutdown():
 
     if motion==1 and traj_flag[0]==0:
 #        trj_q=[0,0,90,0,90,0]
-        trj_q=np.array([90,45,90,0,-45,0])*deg2rad
+        trj_q=np.array([-90,45,90,0,-45,0])*deg2rad
 #        trj_q=[90,45,90,0,-45,0]
         motion+=1
 #        motion=0
         traj_flag=[1]*6
     elif motion==2 and traj_flag[0]==0:
-        trj_q=np.array([90,0,0,0,0,0])*deg2rad
+        trj_q=np.array([-90,0,0,0,0,0])*deg2rad
         motion+=1
         traj_flag=[1]*6
     elif motion==3 and traj_flag[0]==0:
-        trj_q=np.array([100, -10, 20, -30, 10, 20])*deg2rad
+        trj_q=np.array([-100, -10, 20, -30, 10, 20])*deg2rad
         motion+=1
         traj_flag=[1]*6
     elif motion==4 and traj_flag[0]==0:
-        trj_q=np.array([115, 0, 10, -50, 20, 40])*deg2rad
+        trj_q=np.array([-115, 0, 10, -50, 20, 40])*deg2rad
         motion+=1
         traj_flag=[1]*6
     elif motion==5 and traj_flag[0]==0:
-        trj_q=np.array([140, 50, 50, 50, 50, 50])*deg2rad
+        trj_q=np.array([-140, 50, 50, 50, 50, 50])*deg2rad
         motion+=1
         traj_flag=[1]*6
     elif motion==6 and traj_flag[0]==0:
-        trj_q=np.array([120, 10, 30, -20, 10, 60])*deg2rad
+        trj_q=np.array([-120, 10, 30, -20, 10, 60])*deg2rad
         motion+=1
         traj_flag=[1]*6
     elif motion==7 and traj_flag[0]==0:
-        trj_q=np.array([110, 20, 40, 20, 0, 90])*deg2rad
+        trj_q=np.array([-110, 20, 40, 20, 0, 90])*deg2rad
         motion=1
         traj_flag=[1]*6
 

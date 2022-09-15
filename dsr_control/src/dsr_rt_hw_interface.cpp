@@ -1011,6 +1011,19 @@ namespace dsr_control{
             while ((Drfl.get_robot_state() != STATE_STANDBY)){
                 usleep(delay);
             }
+            if(m_strRobotGripper == "charger")
+            {
+                string strTCP = Drfl.get_tcp();
+                string strTOOL = Drfl.get_tool();
+                if(strTCP!="ChargerTCP")
+                {
+                    Drfl.set_tcp("ChargerTCP");
+                }
+                if(strTCP!="Charger")
+                {
+                    Drfl.set_tool("Charger");
+                }
+             }
 
             //--- Set Robot mode : MANUAL or AUTO
             //assert(Drfl.SetRobotMode(ROBOT_MODE_MANUAL));
@@ -1035,7 +1048,7 @@ namespace dsr_control{
             Drfl.set_rt_control_output(version, period, losscount);
             Drfl.start_rt_control();
             Drfl.set_safety_mode(SAFETY_MODE_AUTONOMOUS,SAFETY_MODE_EVENT_MOVE);
-
+            
             return true;
          }
         return false;
