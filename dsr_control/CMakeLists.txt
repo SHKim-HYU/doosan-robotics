@@ -4,6 +4,7 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   dsr_msgs
+  dsr_sim_msgs
   controller_manager
   hardware_interface
   serial
@@ -11,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
 )
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS dsr_msgs controller_manager hardware_interface roscpp serial
+  CATKIN_DEPENDS dsr_msgs dsr_sim_msgs controller_manager hardware_interface roscpp serial
 )
 
 SET( COMMON_INC_FILES
@@ -43,6 +44,12 @@ SET( RT_SRC_FILES
   ${SERIAL_SRC_FILES}
   src/dsr_rt_hw_interface.cpp
   src/dsr_rt_control_node.cpp
+)
+
+SET( SIM_SRC_FILES
+  ${SERIAL_SRC_FILES}
+  src/dsr_sim_hw_interface.cpp
+  src/dsr_sim_control_node.cpp
 )
 
 LINK_LIBRARIES(DRFL PocoFoundation PocoNet)
@@ -84,6 +91,19 @@ target_link_libraries(dsr_rt_control_node DRFL PocoFoundation PocoNet)
 
 
 install(TARGETS dsr_rt_control_node
+   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+add_executable(dsr_sim_control_node ${SIM_SRC_FILES})
+add_dependencies(dsr_sim_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(dsr_sim_control_node ${catkin_LIBRARIES})
+target_link_libraries(dsr_sim_control_node DRFL PocoFoundation PocoNet)
+
+
+install(TARGETS dsr_sim_control_node
    ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

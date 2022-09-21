@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
 # actionlib_msgs
   sensor_msgs
   dsr_msgs  
+  dsr_sim_msgs
 )
 
 # Generate messages in the 'msg' folder

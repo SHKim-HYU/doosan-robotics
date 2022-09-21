@@ -33,7 +33,7 @@
       <arg name="yaml"          value="dsr_control"/>
     </include>
     <!-- 제어기를 위한 controller -->
-    <include file="$(find dsr_control)/launch/dsr_control.launch">
+    <include file="$(find dsr_control)/launch/dsr_sim_control.launch">
       <arg name="ns"            value="$(arg ns)"/>
       <arg name="host"          value="$(arg host)"/>
       <arg name="port"          value="$(arg port)"/>
@@ -57,7 +57,7 @@
       <arg name="yaml"          value="dsr_control_robotiq_2f"/>
     </include>
     <!-- 제어기를 위한 controller -->
-    <include file="$(find dsr_control)/launch/dsr_control.launch">
+    <include file="$(find dsr_control)/launch/dsr_sim_control.launch">
       <arg name="ns"            value="$(arg ns)"/>
       <arg name="host"          value="$(arg host)"/>
       <arg name="port"          value="$(arg port)"/>

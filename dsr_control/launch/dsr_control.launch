@@ -3,10 +3,10 @@
 <launch>
     <arg name="ros_version" default="$(env ROS_DISTRO)"/>
 	<arg name="ns" default="dsr01"/>
-	<arg name="host" default="127.0.0.1"/>
+	<arg name="host" default="192.168.12.21"/>
 	<arg name="port" default="12345"/>
-	<arg name="mode" default="virtual"/>
-	<arg name="model" default="m1013"/>
+	<arg name="mode" default="real"/>
+	<arg name="model" default="m0609"/>
 	<arg name="color" default="color"/>
     <arg name="gripper" default="none"/>
 	<arg name="mobile" default="none"/>

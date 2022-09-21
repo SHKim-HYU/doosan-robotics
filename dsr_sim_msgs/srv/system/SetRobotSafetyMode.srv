@@ -1,0 +1,19 @@
+#____________________________________________________________________________________________
+# get_robot_system
+#____________________________________________________________________________________________
+
+
+int8 robot_safety_mode   # 0 : SAFETY_MODE_MANUAL
+                         # 1 : SAFETY_MODE_AUTONOMOUS
+                         # 2 : SAFETY_MODE_RECOVERY
+                         # 3 : SAFETY_MODE_BACKDRIVE
+                         # 4 : SAFETY_MODE_MEASURE
+                         # 5 : SAFETY_MODE_INITIALIZE
+                         # 6 : SAFETY_MODE_LAST
+                         
+int8 robot_safety_mode_event   # 0 : SAFETY_MODE_EVENT_ENTER
+                               # 1 : SAFETY_MODE_EVENT_MOVE
+                               # 2 : SAFETY_MODE_EVENT_STOP
+                               # 3 : SAFETY_MODE_EVENT_LAST
+---                         
+bool        success
