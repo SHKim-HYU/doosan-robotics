@@ -13,7 +13,7 @@ sys.dont_write_bytecode = True
 
 # for single robot 
 ROBOT_ID     = "dsr01"
-ROBOT_MODEL  = "m1013"
+ROBOT_MODEL  = "m0609"
 from DSR_ROBOT import *
 __dsr__id = ROBOT_ID
 __dsr__model = ROBOT_MODEL

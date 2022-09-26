@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+from tasho import task_prototype_rockit as tp
+from tasho import input_resolution, world_simulator
+from tasho import robot as rob
+import casadi as cs
+
 import rospy
 from std_msgs.msg import Float32MultiArray
 from sensor_msgs.msg import JointState
@@ -21,6 +26,7 @@ ROBOT_MODEL  = "m0609"
 from DSR_ROBOT import *
 __dsr__id = ROBOT_ID
 __dsr__model = ROBOT_MODEL
+n_dof = 6
 
 #############################################################################
 ################## Manager for global data multiprocessing ##################
@@ -29,45 +35,79 @@ __dsr__model = ROBOT_MODEL
 manager = Manager()
 _q = manager.dict()
 _q_d = manager.dict()
+_x_d = manager.dict()
 
 _q['q_r'] = [0.0]*6; _q['q_r_dot'] = [0.0]*6; _q['trq_r_g'] = [0.0]*6; 
-_q['q_n'] = [0.0]*6; _q['q_n_dot'] = [0.0]*6; _q['trq_n_g'] = [0.0]*6; 
+_q['q_n'] = [0.0]*6; _q['q_n_dot'] = [0.0]*6; _q['q_n_ddot'] = [0.0]*6; _q['trq_n_g'] = [0.0]*6; 
 _q_d['qd'] = [0.0]*6; _q_d['qd_dot'] = [0.0]*6; _q_d['qd_ddot'] = [0.0]*6; _q['trq_ext'] = [0.0]*6; _q['wrench_ext'] = [0.0]*6;
-_q_d['qd_itp']=[[0.0]*horizon_size]*6
-_q_d['qd_dot_itp']=[[0.0]*horizon_size]*6
-_q_d['qd_ddot_itp']=[[0.0]*horizon_size]*6
+_x_d['x_d'] = [0.0]*6
 
+
+deg2rad = 3.141592/180
 
 def nominal_run():
-    rate = 1000
+    rate = 2000
     rospy.init_node('nominal_node')
     nominal_rate = rospy.Rate(rate)
 
-    ### M0609 Kinematic parameters based on URDF file
-    link_01 = np.array([0, 0, 0.135]); link_12 = np.array([0, -0.0062, 0]); link_23 = np.array([0, 0, 0.411]);
-    link_34 = np.array([0, 0, 0.368]); link_45 = np.array([0, 0, 0]); link_56 = np.array([0, 0, 0.121]); link_6E = np.array([-0.024, 0, 0.0735])
-    w=np.array([[0,0,1],[0,1,0],[0,1,0],[0,0,1],[0,1,0],[0,0,1]])
-    L_=np.array([(link_01+link_12)[:], (link_01+link_12+link_23)[:],(link_01+link_12+link_23+link_34)[:],(link_01+link_12+link_23+link_34+link_45)[:]\
-    ,(link_01+link_12+link_23+link_34+link_45+link_56)[:],(link_01+link_12+link_23+link_34+link_45+link_56+link_6E)[:]])
-    P_=np.array([link_01[:],(link_01+link_12)[:], (link_01+link_12+link_23)[:],(link_01+link_12+link_23+link_34)[:],(link_01+link_12+link_23+link_34+link_45)[:]\
-    ,(link_01+link_12+link_23+link_34+link_45+link_56)[:]])
-    v = np.array([-mr.VecToso3(w[0,:])@P_[0,:],-mr.VecToso3(w[1,:])@P_[1,:],-mr.VecToso3(w[2,:])@P_[2,:],-mr.VecToso3(w[3,:])@P_[3,:],-mr.VecToso3(w[4,:])@P_[4,:],-mr.VecToso3(w[5,:])@P_[5,:]])
-    Slist = np.transpose(np.array([np.append(w[0,:],v[0,:]),np.append(w[1,:],v[1,:]),np.append(w[2,:],v[2,:]),np.append(w[3,:],v[3,:]),np.append(w[4,:],v[4,:]),np.append(w[5,:],v[5,:])]))
-    T_0 = np.array([[1,0,0,L_[-1,0]],[0,1,0,L_[-1,1]],[0,0,1,L_[-1,2]],[0,0,0,1]])
-    T_0[0:3,0:3] = tf.transformations.euler_matrix(0,-100*deg2rad,0)[0:3,0:3]
-    Blist = mr.Adjoint(mr.TransInv(T_0))@Slist
-    J_b_mr = np.zeros((6,6))
-    J_s_mr = np.zeros((6,6))
+    #Different OCP options
+    robot_choice = 'm0609' #'kinova'#'iiwa7' #
+
+    robot = rob.Robot(robot_choice)
+    jac_fun = robot.set_kinematic_jacobian(name="jac_fun",q = n_dof)
+
+    drt_read=rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/realtime/read_data_rt', ReadDataRT)
+    init_time=time.time()
+
+    readdata=drt_read()
+    init_pos = readdata.data.actual_joint_position
+    print(init_pos)
+    _q['q_n'] = [init_pos[0]*deg2rad, init_pos[1]*deg2rad, init_pos[2]*deg2rad, init_pos[3]*deg2rad, init_pos[4]*deg2rad, init_pos[5]*deg2rad]
+
+    """
+        ### M0609 Kinematic parameters based on URDF file
+        # link_01 = np.array([0, 0, 0.135]); link_12 = np.array([0, -0.0062, 0]); link_23 = np.array([0, 0, 0.411]);
+        # link_34 = np.array([0, 0, 0.368]); link_45 = np.array([0, 0, 0]); link_56 = np.array([0, 0, 0.121]); link_6E = np.array([-0.024, 0, 0.0735])
+        # w=np.array([[0,0,1],[0,1,0],[0,1,0],[0,0,1],[0,1,0],[0,0,1]])
+        # L_=np.array([(link_01+link_12)[:], (link_01+link_12+link_23)[:],(link_01+link_12+link_23+link_34)[:],(link_01+link_12+link_23+link_34+link_45)[:]\
+        # ,(link_01+link_12+link_23+link_34+link_45+link_56)[:],(link_01+link_12+link_23+link_34+link_45+link_56+link_6E)[:]])
+        # P_=np.array([link_01[:],(link_01+link_12)[:], (link_01+link_12+link_23)[:],(link_01+link_12+link_23+link_34)[:],(link_01+link_12+link_23+link_34+link_45)[:]\
+        # ,(link_01+link_12+link_23+link_34+link_45+link_56)[:]])
+        # v = np.array([-mr.VecToso3(w[0,:])@P_[0,:],-mr.VecToso3(w[1,:])@P_[1,:],-mr.VecToso3(w[2,:])@P_[2,:],-mr.VecToso3(w[3,:])@P_[3,:],-mr.VecToso3(w[4,:])@P_[4,:],-mr.VecToso3(w[5,:])@P_[5,:]])
+        # Slist = np.transpose(np.array([np.append(w[0,:],v[0,:]),np.append(w[1,:],v[1,:]),np.append(w[2,:],v[2,:]),np.append(w[3,:],v[3,:]),np.append(w[4,:],v[4,:]),np.append(w[5,:],v[5,:])]))
+        # T_0 = np.array([[1,0,0,L_[-1,0]],[0,1,0,L_[-1,1]],[0,0,1,L_[-1,2]],[0,0,0,1]])
+        # T_0[0:3,0:3] = tf.transformations.euler_matrix(0,-100*deg2rad,0)[0:3,0:3]
+        # Blist = mr.Adjoint(mr.TransInv(T_0))@Slist
+        # J_b_mr = np.zeros((6,6))
+        # J_s_mr = np.zeros((6,6))
+    """
 
     while not rospy.is_shutdown():
 
+        jac, jac_rot=jac_fun(_q['q_n'])
+        J_geo = cs.vertcat(jac_rot,jac)
 
+        M_n = robot.M(_q['q_n']).full().reshape(n_dof,n_dof)
+        M_n_inv = robot.Minv(_q['q_n']).full().reshape(n_dof,n_dof)
+        C_n = robot.C(_q['q_n'],_q['q_n_dot']).full().reshape(n_dof,n_dof)
+        G_n = robot.G(_q['q_n']).full().reshape(n_dof)
+
+        # nominal
+        # print(C_n@np.array(_q['q_n_dot'])-G_n)
+        _q['q_n_ddot'] = M_n_inv@(-C_n@np.array(_q['q_n_dot']))
+        _q['q_n'] = np.array(_q['q_n']) + np.array(_q['q_n_dot'])*(1/rate)
+        _q['q_n_dot'] = np.array(_q['q_n_dot']) + np.array(_q['q_n_ddot'])*(1/rate) 
+
+        fk_vals = robot.fk()
+        # print('q : ',_q['q_n'])
+        # print('q_dot : ',_q['q_n_dot'],'\n')   
         nominal_rate.sleep()
 
 def m0609_run():
 
     ### Sellect the controller options: position and velocity controller are not implemented yet (those make some purterbation during the execution)
     control_type = "gravity" #"gravity" #"velocity" #"position" #
+
 
     traj = Trajectory(6)
     traj_flag = [0]*6
@@ -86,29 +126,17 @@ def m0609_run():
 
 
     drt_read=rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/realtime/read_data_rt', ReadDataRT)
-    drt_write=rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/realtime/write_data_rt', WriteDataRT)
 
     print("setup has done")
 
-    if control_type=="position":
-        command = rospy.Publisher("/dsr01m0609/servoj_rt_stream", ServoJRTStream, queue_size=1)
-    elif control_type=="velocity":
-        command = rospy.Publisher("/dsr01m0609/speedj_rt_stream", SpeedJRTStream, queue_size=1)
-    elif control_type=="torque" or  control_type == "gravity":
-        command = rospy.Publisher("/dsr01m0609/torque_rt_stream", TorqueRTStream, queue_size=1)
+
+    command = rospy.Publisher("/dsr01m0609/torque_rt_stream", TorqueRTStream, queue_size=1)
     governor=rospy.Rate(rate)
 
 
-    if control_type=="position":
-        cmd_pos=ServoJRTStream()
-        cmd_pos.time=1/rate
-    elif control_type=="velocity":
-        cmd_vel=SpeedJRTStream()
-        cmd_vel.time=1/rate
-    elif control_type == "torque" or control_type == "gravity" :
-        cmd_tor=TorqueRTStream()
-        cmd_tor.tor = [0]*6
-        cmd_tor.time = 1/rate
+    cmd_tor=TorqueRTStream()
+    cmd_tor.tor = [0]*6
+    cmd_tor.time = 1/rate
 
     init_time=time.time()
     deg2rad = 3.141592/180
@@ -127,6 +155,7 @@ def m0609_run():
     readdata=drt_read()
     init_pos = readdata.data.actual_joint_position
     print(init_pos)
+
     print("Commanding a small wiggle")
     while not rospy.is_shutdown():
         g_time = time.time()
@@ -137,6 +166,14 @@ def m0609_run():
         ,readdata.data.actual_joint_velocity[3]*deg2rad,readdata.data.actual_joint_velocity[4]*deg2rad,readdata.data.actual_joint_velocity[5]*deg2rad]
         tor_g = readdata.data.gravity_torque
         tor_ext_tmp = readdata.data.external_joint_torque
+
+        
+        # print('M\n',M_)
+        # print('Minv\n',M_inv)
+        # print('C\n',C_)
+        # print('G\n',G_)
+
+
 
         if motion==1 and traj_flag[0]==0:
             trj_q=np.array([-90,45,90,0,-45,0])*deg2rad
@@ -185,36 +222,8 @@ def m0609_run():
                 if tmp_flag == 0:
                     traj_flag[i]=0
 
-        if control_type == "position":
-            # generate a signal for the robot to track
-            for i in range(6):
-                cmd_pos.pos[i] = qd[i]
-                cmd_pos.vel[i] = qd_dot[i]
-                cmd_pos.acc[i] = qd_ddot[i]
 
-            #publish command
-            command.publish(cmd_pos)
-
-            print(cmd_pos.pos)
-            print(cmd_pos.vel)
-            print(cmd_pos.acc)
-            print("")
-
-        elif control_type == "velocity":
-            # generate a signal for the robot to track
-            for i in range(6):
-                cmd_vel.vel[i] = qd_dot[i]
-                cmd_vel.acc[i] = qd_ddot[i]
-
-            #publish command
-            command.publish(cmd_vel)
-
-            print(cmd_vel.vel)
-            print(cmd_vel.acc)
-            print(cmd_vel.time)
-            print("")
-
-        elif control_type == "torque":
+        if control_type == "torque":
 
 
             for i in range(6):
@@ -246,11 +255,14 @@ def m0609_run():
         elif control_type == "gravity":
             for i in range(6):
                 tor_ext[i] = alpha*tor_ext_tmp[i] + (1-alpha)*buf_tor_ext[i];
-                cmd_tor.tor[i] = tor_g[i]+2.5*tor_ext[i]
+                cmd_tor.tor[i] = tor_g[i]#+2.5*tor_ext[i]
                 buf_tor_ext[i]=tor_ext[i]
-            command.publish(cmd_tor)
 
-            print(cmd_tor.tor)
+            command.publish(cmd_tor)
+            print(tor_g)
+            # print(cmd_tor.tor)
+
+
         # 10Hz
         governor.sleep()
 

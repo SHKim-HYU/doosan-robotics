@@ -113,8 +113,6 @@ if __name__ == "__main__":
 
     pub_stop = rospy.Publisher('/'+ROBOT_ID +ROBOT_MODEL+'/stop', RobotStop, queue_size=10)           
 
-    set_robot_mode(ROBOT_MODE_AUTONOMOUS)
-
     set_velx(30,20)  # set global task speed: 30(mm/sec), 20(deg/sec)
     set_accx(60,40)  # set global task accel: 60(mm/sec2), 40(deg/sec2)
 

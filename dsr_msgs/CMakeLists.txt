@@ -3,6 +3,7 @@ project(dsr_msgs)
 
 find_package(catkin REQUIRED COMPONENTS
     std_msgs
+    geometry_msgs
     message_generation
 )
 
@@ -171,12 +172,12 @@ add_service_files(
     ./realtime/StartRTControl.srv
     ./realtime/StopRTControl.srv
     ./realtime/WriteDataRT.srv
-
 )
 
 generate_messages(
     DEPENDENCIES
     std_msgs
+    geometry_msgs
 ) 
 
 catkin_package(

@@ -8,8 +8,8 @@
     <xacro:dsr_materials />
 		<link name="base_0">
 			<inertial>
-				<mass value="3.18"/>
-				<origin xyz="-2.8e-05   -0.006045    0.038403"/>
+				<mass value="2.953"/>
+				<origin xyz="-1.6e-05 -0.00021  0.03882"/>
 				<inertia ixx="0.017789" ixy="-7.4356e-06" ixz="3.0378e-06" iyy="0.011135"
 					iyz="-0.00029038"
 					izz="0.020054"/>
@@ -32,8 +32,8 @@
 		</joint>
 		<link name="link1">
 			<inertial>
-				<mass value="5.02"/>
-				<origin xyz="7.2e-05    0.036227   -0.003417"/>
+				<mass value="4.935"/>
+				<origin xyz="6.8e-05    0.036439   -0.005709"/>
 				<inertia ixx="0.026195" ixy="2.3904e-05" ixz="-1.3319e-05" iyy="0.016899"
 					iyz="-0.00071987"
 					izz="0.022944"/>
@@ -61,8 +61,8 @@
 		</joint>
 		<link name="link2">
 			<inertial>
-				<mass value="8.04"/>
-				<origin xyz="0.20447     2.6e-05     0.16005"/>
+				<mass value="8.363"/>
+				<origin xyz="0.205144     3e-06     0.15744"/>
 				<inertia ixx="0.026743" ixy="-0.00019461" ixz="-0.00058734" iyy="0.30084"
 					iyz="-6.7892e-06"
 					izz="0.29898"/>
@@ -103,8 +103,8 @@
 		</joint>
 		<link name="link3">
 			<inertial>
-				<mass value="3.6"/>
-				<origin xyz="-2.2e-05   -0.006867    0.043445"/>
+				<mass value="3.583"/>
+				<origin xyz="-7e-06   -0.009445    0.044429"/>
 				<inertia ixx="0.018342" ixy="1.1302e-05" ixz="-4.5308e-06" iyy="0.018239"
 					iyz="-0.00099247"
 					izz="0.01326"/>
@@ -127,8 +127,8 @@
 		</joint>
 		<link name="link4">
 			<inertial>
-				<mass value="3.57"/>
-				<origin xyz="4e-05    0.097079    -0.10981"/>
+				<mass value="3.433"/>
+				<origin xyz="9e-06    0.094913    -0.108502"/>
 				<inertia ixx="0.08035" ixy="-4.6119e-06" ixz="-8.1798e-06" iyy="0.066005"
 					iyz="-0.028996"
 					izz="0.029763"/>
@@ -163,8 +163,8 @@
 		</joint>
 		<link name="link5">
 			<inertial>
-				<mass value="2.83"/>
-				<origin xyz="-6.8e-05    0.003827    0.031969"/>
+				<mass value="2.598"/>
+				<origin xyz="-1.5e-5    0.000472    0.0321"/>
 				<inertia ixx="0.014275" ixy="2.2026e-05" ixz="3.3017e-06" iyy="0.012569"
 					iyz="0.00045077"
 					izz="0.0085318"/>
@@ -193,8 +193,8 @@
 		</joint>
 		<link name="link6">
 			<inertial>
-				<mass value="1.16"/>
-				<origin xyz="-3e-05    -4.5e-05     -0.0539"/>
+				<mass value="1.128"/>
+				<origin xyz="-1.72e-04    -2.1e-04     -0.052278"/>
 				<inertia ixx="0.0080226" ixy="1.371e-06" ixz="6.3578e-06" iyy="0.0053992"
 					iyz="7.4676e-06"
 					izz="0.0053912"/>

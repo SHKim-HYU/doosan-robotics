@@ -14,6 +14,9 @@ import os
 import math
 import rospy
 
+from DSR_ROBOT import *
+from dsr_msgs.msg import ServoJStream, ServoJRTStream, SpeedJRTStream, SpeedJRTStream, RobotStateRT, TorqueRTStream
+
 from multiprocessing import Process, Manager
 import tf
 import modern_robotics as mr
@@ -29,8 +32,13 @@ def nominal_run():
 	print("Task specification and visualization of P2P OCP")
 	rospy.init_node('pybullet_control_test')
 
+	rospy.wait_for_service('/dsr01m0609/realtime/read_data_rt')
+	try:
+		drt_read = rospy.ServiceProxy('/dsr01m0609/realtime/read_data_rt', ReadDataRT)
 
-	script_dir=os.path.dirname(__file__)
+	except rospy.ServiceException as e:
+		print("Service call failed: %s"%e)
+
 	horizon_size = 20
 	t_ocp = 0.2
 	max_joint_acc = 120*3.14159/180
@@ -81,7 +89,6 @@ def nominal_run():
 
 	joint_indices = [1, 2, 3, 4, 5, 6]
 	obj.resetJointState(dsrID, joint_indices, q0_val)
-	print(obj.getJointInfoArray(dsrID))
 
 
 	e = [0]*len(joint_indices)
@@ -119,6 +126,13 @@ def nominal_run():
 		jac, jac_rot=jac_fun(q_arr)
 		J_geo = cs.vertcat(jac_rot,jac)
 		G_vals=robot.G(q_arr).full().reshape(len(joint_indices))
+		M = robot.M(q_arr).full().reshape(len(joint_indices),len(joint_indices))
+		C = robot.C(q_arr,q_dot_arr).full().reshape(len(joint_indices),len(joint_indices))
+		
+
+		print("M:\n",M)
+		print("C:\n",C)
+		print("G:\n",G_vals)
 		twist_s=J_geo@q_dot_vec
 		#print("twist_s",twist_s)
 		#print(G_vals)
@@ -152,6 +166,8 @@ def nominal_run():
 		end_time = time.time()
 		loop_time = (end_time-start_time)*1000 # [ms]
 		global_time = end_time-init_time
+		
+		"""
 		print("################ Arm joint state ################")
 		print("Joint 1: qd1=%f,\tqd1_dot=%f\n\tq1=%f,\tq1_dot=%f,\n\ttorque_des=%f" %(qd[0],qd_dot[0],q_act[0][0],q_act[0][1],tau[0]))
 		print("Joint 2: qd2=%f,\tqd2_dot=%f\n\tq2=%f,\tq2_dot=%f,\n\ttorque_des=%f" %(qd[1],qd_dot[1],q_act[1][0],q_act[1][1],tau[1]))
@@ -164,7 +180,7 @@ def nominal_run():
 		print()
 		#print(fk_act_vals[0:3,3])
 		print("\n\n")
-		#"""
+		"""
 		obj.run_simulation(1)
 		#print(fk_vals.type)
 		i+=1

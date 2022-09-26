@@ -8,6 +8,7 @@ from dsr_msgs.msg import ServoJStream, ServoJRTStream, SpeedJRTStream, SpeedJRTS
 from trajectory_generate import Trajectory
 from time import time
 import numpy as np
+from tasho import robot as rob
 
 ROBOT_ID     = "dsr01"
 ROBOT_MODEL  = "m0609"
@@ -17,7 +18,7 @@ __dsr__model = ROBOT_MODEL
 
 
 ### Sellect the controller options: position and velocity controller are not implemented yet (those make some purterbation during the execution)
-control_type = "gravity" #"gravity" #"velocity" #"position" #
+control_type = "casadi" #"gravity" #"velocity" #"position" #
 
 traj = Trajectory(6)
 traj_flag = [0]*6
@@ -34,6 +35,8 @@ rate=200
 print("Setting up node roscontrol_test, I will wiggle the second last joint ~10deg each way.")
 rospy.init_node('roscontrol_test')
 
+robot_choice = 'm0609'
+robot = rob.Robot(robot_choice)
 
 drt_read=rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/realtime/read_data_rt', ReadDataRT)
 drt_write=rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/realtime/write_data_rt', WriteDataRT)
@@ -44,7 +47,7 @@ if control_type=="position":
     command = rospy.Publisher("/dsr01m0609/servoj_rt_stream", ServoJRTStream, queue_size=1)
 elif control_type=="velocity":
     command = rospy.Publisher("/dsr01m0609/speedj_rt_stream", SpeedJRTStream, queue_size=1)
-elif control_type=="torque" or  control_type == "gravity":
+elif control_type=="torque" or  control_type == "gravity" or control_type == "casadi":
     command = rospy.Publisher("/dsr01m0609/torque_rt_stream", TorqueRTStream, queue_size=1)
 governor=rospy.Rate(rate)
 
@@ -55,7 +58,7 @@ if control_type=="position":
 elif control_type=="velocity":
     cmd_vel=SpeedJRTStream()
     cmd_vel.time=1/rate
-elif control_type == "torque" or control_type == "gravity" :
+elif control_type == "torque" or control_type == "gravity" or control_type == "casadi":
     cmd_tor=TorqueRTStream()
     cmd_tor.tor = [0]*6
     cmd_tor.time = 1/rate
@@ -87,6 +90,10 @@ while not rospy.is_shutdown():
     ,readdata.data.actual_joint_velocity[3]*deg2rad,readdata.data.actual_joint_velocity[4]*deg2rad,readdata.data.actual_joint_velocity[5]*deg2rad]
     tor_g = readdata.data.gravity_torque
     tor_ext_tmp = readdata.data.external_joint_torque
+
+    G_vals=robot.G(q).full().reshape(len(q))
+    M = robot.M(q).full().reshape(len(q),len(q))
+    C = robot.C(q,q_dot).full().reshape(len(q),len(q))  
 
     if motion==1 and traj_flag[0]==0:
 #        trj_q=[0,0,90,0,90,0]
@@ -199,7 +206,18 @@ while not rospy.is_shutdown():
             cmd_tor.tor[i] = tor_g[i]+2.5*tor_ext[i]
             buf_tor_ext[i]=tor_ext[i]
         command.publish(cmd_tor)
-
-        print(cmd_tor.tor)
+        print(tor_g)
+        # print(cmd_tor.tor)
     # 10Hz
+
+    elif control_type == "casadi":
+        for i in range(6):
+            tor_ext[i] = alpha*tor_ext_tmp[i] + (1-alpha)*buf_tor_ext[i];
+            cmd_tor.tor[i] = G_vals[i]#+2.5*tor_ext[i]
+            buf_tor_ext[i]=tor_ext[i]
+        command.publish(cmd_tor)
+        print('gravity_model: ',G_vals)
+        print('gravity_robot: ',tor_g)
+        # print(cmd_tor.tor)
+
     governor.sleep()
