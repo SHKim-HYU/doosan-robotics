@@ -14,6 +14,7 @@ from dsr_msgs.msg import ServoJStream, ServoJRTStream, SpeedJRTStream, SpeedJRTS
 from trajectory_generate import Trajectory
 from time import time
 import numpy as np
+import modern_robotics as mr
 
 from multiprocessing import Process, Manager
 import tf
@@ -35,12 +36,14 @@ n_dof = 6
 manager = Manager()
 _q = manager.dict()
 _q_d = manager.dict()
+_x = manager.dict()
 _x_d = manager.dict()
 
-_q['q_r'] = [0.0]*6; _q['q_r_dot'] = [0.0]*6; _q['trq_r_g'] = [0.0]*6; 
-_q['q_n'] = [0.0]*6; _q['q_n_dot'] = [0.0]*6; _q['q_n_ddot'] = [0.0]*6; _q['trq_n_g'] = [0.0]*6; 
-_q_d['qd'] = [0.0]*6; _q_d['qd_dot'] = [0.0]*6; _q_d['qd_ddot'] = [0.0]*6; _q['trq_ext'] = [0.0]*6; _q['wrench_ext'] = [0.0]*6;
-_x_d['x_d'] = [0.0]*6
+_q['q_r'] = [0.0]*n_dof; _q['q_r_dot'] = [0.0]*n_dof; _q['trq_r_g'] = [0.0]*n_dof; 
+_q['q_n'] = [0.0]*n_dof; _q['q_n_dot'] = [0.0]*n_dof; _q['q_n_ddot'] = [0.0]*n_dof; _q['trq_n_g'] = [0.0]*n_dof; 
+_q_d['qd'] = [0.0]*n_dof; _q_d['qd_dot'] = [0.0]*n_dof; _q_d['qd_ddot'] = [0.0]*n_dof; _q['trq_ext'] = [0.0]*n_dof; _q['wrench_ext'] = [0.0]*n_dof;
+_x['x_n'] = [0.0]*n_dof; _x['v_n'] = [0.0]*n_dof;
+_x_d['x_d'] = [0.0]*n_dof; _x_d['v_d']=[0.0]*n_dof;
 
 
 deg2rad = 3.141592/180
@@ -59,11 +62,18 @@ def nominal_run():
     drt_read=rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/realtime/read_data_rt', ReadDataRT)
     init_time=time.time()
 
+    _x_d['x_d'] = [0.5835, -0.01022, 0.21142, 180.0*deg2rad, 10.0*deg2rad, 180.0*deg2rad]
+    K = np.diag([100,100,100,1000,1000,1000])
+    D = 30*(1/rate)*K
     readdata=drt_read()
     init_pos = readdata.data.actual_joint_position
     print(init_pos)
     _q['q_n'] = [init_pos[0]*deg2rad, init_pos[1]*deg2rad, init_pos[2]*deg2rad, init_pos[3]*deg2rad, init_pos[4]*deg2rad, init_pos[5]*deg2rad]
 
+    e = [0.0]*n_dof; e_dot = [0.0]*n_dof
+
+    Jb_dot = np.zeros([6*n_dof,n_dof])
+    Jb_dot_t = np.zeros([6,6])
     """
         ### M0609 Kinematic parameters based on URDF file
         # link_01 = np.array([0, 0, 0.135]); link_12 = np.array([0, -0.0062, 0]); link_23 = np.array([0, 0, 0.411]);
@@ -83,24 +93,57 @@ def nominal_run():
     """
 
     while not rospy.is_shutdown():
+        print('q : ',_q['q_n'])
+        print('q_dot : ',_q['q_n_dot'])   
+        print(np.linalg.norm(e[0:3],2),'\n')
+
+        fk_vals = robot.fk(_q['q_n'])[6].full().reshape(4,4)
 
         jac, jac_rot=jac_fun(_q['q_n'])
-        J_geo = cs.vertcat(jac_rot,jac)
+        J_geo = cs.vertcat(jac_rot, jac).full().reshape(6,n_dof)
+        
+        for i in range(n_dof):
+            for j in range(i+1,n_dof):
+                Jb_dot[6*i:6*i+6,j] = mr.ad(J_geo[:,i])@J_geo[:,j]
+                Jb_dot_t[i,j] = Jb_dot[6*i:6*i+6,j]@_q['q_n_dot']
+
+        _x['v_n'] = np.array(J_geo@_q['q_n_dot'])
+        # print(J_geo.round(3))
+        print(_x['v_n'])
+        # error definition
+        # position error
+        e[3:] = np.array(_x_d['x_d'][0:3]) - fk_vals[0:3,3] 
+        e_dot = np.array(_x_d['v_d']) - _x['v_n']
+
+        # orientation error
+        q_d = tf.transformations.unit_vector(tf.transformations.quaternion_from_euler(_x_d['x_d'][3], _x_d['x_d'][4], _x_d['x_d'][5])) # xyzw
+        q_n = tf.transformations.unit_vector(tf.transformations.quaternion_from_matrix(fk_vals))
+        q_r = tf.transformations.quaternion_multiply(q_d,tf.transformations.quaternion_conjugate(q_n))
+        e[0:3] = q_r[0:3]*np.sign(q_r[3])
 
         M_n = robot.M(_q['q_n']).full().reshape(n_dof,n_dof)
         M_n_inv = robot.Minv(_q['q_n']).full().reshape(n_dof,n_dof)
         C_n = robot.C(_q['q_n'],_q['q_n_dot']).full().reshape(n_dof,n_dof)
         G_n = robot.G(_q['q_n']).full().reshape(n_dof)
+        
+        M_n_bar_inv = np.linalg.inv(M_n + (1/rate)*np.transpose(J_geo)@D@J_geo)
+        
+        # nominal FD update
+        _q['q_n_ddot'] = M_n_bar_inv@(K@(e-(1/rate)*_x['v_n'])+D@(e_dot-(1/rate)*Jb_dot_t@_q['q_n_dot'])-C_n@np.array(_q['q_n_dot']))
+        # print(_q['q_n_ddot'])
+        # _f_c = K@e + D@e_dot -(1/rate)*K@_x['v_n'] - (1/rate)*D@(J_geo@_q['q_n_ddot'] + Jb_dot_t@_q['q_n_dot'])
 
-        # nominal
-        # print(C_n@np.array(_q['q_n_dot'])-G_n)
-        _q['q_n_ddot'] = M_n_inv@(-C_n@np.array(_q['q_n_dot']))
+        # print(J_geo@_q['q_n_ddot'] + Jb_dot_t@_q['q_n_dot'])
+        # print(J_geo@_q['q_n_ddot'])
+        # print(Jb_dot_t@_q['q_n_dot'])
+
+        # _t_c = np.transpose(J_geo)@_f_c + G_n
+
         _q['q_n'] = np.array(_q['q_n']) + np.array(_q['q_n_dot'])*(1/rate)
         _q['q_n_dot'] = np.array(_q['q_n_dot']) + np.array(_q['q_n_ddot'])*(1/rate) 
 
-        fk_vals = robot.fk()
-        # print('q : ',_q['q_n'])
-        # print('q_dot : ',_q['q_n_dot'],'\n')   
+        
+        
         nominal_rate.sleep()
 
 def m0609_run():
@@ -259,7 +302,6 @@ def m0609_run():
                 buf_tor_ext[i]=tor_ext[i]
 
             command.publish(cmd_tor)
-            print(tor_g)
             # print(cmd_tor.tor)
 
 
