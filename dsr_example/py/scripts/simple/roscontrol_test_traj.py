@@ -205,7 +205,7 @@ while not rospy.is_shutdown():
         for i in range(6):
             tor_ext[i] = alpha*tor_ext_tmp[i] + (1-alpha)*buf_tor_ext[i];
             drt_safety(1,1)
-            cmd_tor.tor[i] = tor_g[i]#+2.5*tor_ext[i]
+            cmd_tor.tor[i] = tor_g[i]+0.5*tor_ext[i]
             buf_tor_ext[i]=tor_ext[i]
         command.publish(cmd_tor)
         print(tor_g)
