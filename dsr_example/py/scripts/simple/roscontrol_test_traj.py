@@ -18,7 +18,7 @@ __dsr__model = ROBOT_MODEL
 
 
 ### Sellect the controller options: position and velocity controller are not implemented yet (those make some purterbation during the execution)
-control_type = "casadi" #"gravity" #"velocity" #"position" #
+control_type = "gravity" #"casadi" #"velocity" #"position" #
 
 traj = Trajectory(6)
 traj_flag = [0]*6
@@ -40,6 +40,7 @@ robot = rob.Robot(robot_choice)
 
 drt_read=rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/realtime/read_data_rt', ReadDataRT)
 drt_write=rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/realtime/write_data_rt', WriteDataRT)
+drt_safety = rospy.ServiceProxy('/'+ROBOT_ID +ROBOT_MODEL+'/system/set_robot_safety_mode', SetRobotSafetyMode)
 
 print("setup has done")
 
@@ -203,7 +204,8 @@ while not rospy.is_shutdown():
     elif control_type == "gravity":
         for i in range(6):
             tor_ext[i] = alpha*tor_ext_tmp[i] + (1-alpha)*buf_tor_ext[i];
-            cmd_tor.tor[i] = tor_g[i]+2.5*tor_ext[i]
+            drt_safety(1,1)
+            cmd_tor.tor[i] = tor_g[i]#+2.5*tor_ext[i]
             buf_tor_ext[i]=tor_ext[i]
         command.publish(cmd_tor)
         print(tor_g)
